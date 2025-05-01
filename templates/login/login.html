@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script defer src="/static/login.js"></script>
+</head>
+<body>
+    <h2>Login</h2>
+
+    <label>
+        <input type="radio" name="accountType" value="customer" checked>
+        Customer
+    </label>
+    <label>
+        <input type="radio" name="accountType" value="business">
+        Business
+    </label>
+    <br><br>
+
+    <label for="username">Username:</label><br>
+    <input type="text" id="username"><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" id="password"><br><br>
+
+    <button onclick="login()">Login</button>
+
+    <p id="status"></p>
+
+    <p>Don't have an account? <a href="/create-account">Create one here</a></p>
+</body>
+</html>

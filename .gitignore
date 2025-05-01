@@ -1,6 +1,9 @@
 # Ignore PowerShell script
 init-structure.ps1
 
+# Ignore Visual Studio metadata
+.vs/
+
 # Python virtual environments
 venv/
 __pycache__/
