@@ -1,1 +1,11 @@
-.\init-structure.ps1
+# Ignore PowerShell script
+init-structure.ps1
+
+# Python virtual environments
+venv/
+__pycache__/
+*.pyc
+
+# OS-specific
+.DS_Store
+Thumbs.db
