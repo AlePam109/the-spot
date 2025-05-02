@@ -149,7 +149,7 @@ def api_create_business_account():
             conn.close()
             return jsonify(success=False, error="Username already exists")
 
-        with open("database/login/insert_business.sql", "r") as f:
+        with open("database/login/insert_business_user.sql", "r") as f:
             sql = f.read()
         cur.execute(sql, (username, name, username, password, username))
         result = cur.fetchone()
