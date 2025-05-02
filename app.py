@@ -198,7 +198,7 @@ def api_create_customer_account():
 
         with open("database/login/insert_user.sql", "r") as f:
             insert_sql = f.read()
-        cur.execute(insert_sql, (user_id, name, username, password))
+        cur.execute(insert_sql, (user_id, name, username, password, username))
         result = cur.fetchone()
         conn.commit()
         cur.close()
