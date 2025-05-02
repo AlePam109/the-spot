@@ -275,7 +275,6 @@ def api_get_business():
         if not row:
             return jsonify(success=False, error="Business not found")
 
-        # Adjust keys based on SELECT * column order
         colnames = [desc[0] for desc in cur.description]
         details = dict(zip(colnames, row))
 

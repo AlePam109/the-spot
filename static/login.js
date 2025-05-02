@@ -53,7 +53,7 @@ function login() {
                 localStorage.setItem("accountId", id);
                 status.innerText = "Login successful!";
                 // Redirect logic here
-                window.location.href = accountType === "business" ? "/view_businesses" : "/search";
+                window.location.href = accountType === "business" ? "/manage" : "/search";
             } else {
                 status.innerText = "Error: " + (data.error || "Login failed.");
             }
