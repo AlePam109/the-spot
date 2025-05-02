@@ -334,7 +334,7 @@ def api_create_business():
     data = request.get_json()
     required_fields = [
         "account_id", "name", "address", "city", "state", "postal_code",
-        "latitude", "longitude", "stars", "review_count", "is_open",
+        "latitude", "longitude", "is_open",
         "attributes", "categories", "hours"
     ]
 
@@ -348,15 +348,19 @@ def api_create_business():
         cur = conn.cursor()
 
         with open("database/business/create_business.sql", "r") as f:
-            sql = f.read()
+            insert_sql = f.read()
 
-        cur.execute(sql, (
+        cur.execute(insert_sql, (
             business_id, data["name"], data["address"], data["city"], data["state"],
             data["postal_code"], data["latitude"], data["longitude"],
-            data["stars"], data["review_count"], data["is_open"],
-            Json(data["attributes"]), data["categories"], Json(data["hours"]),
-            data["account_id"]
+            data["is_open"],Json(data["attributes"]), data["categories"], 
+            Json(data["hours"]), data["account_id"]
         ))
+
+        with open("database/business/update_num_businesses.sql", "r") as f:
+            update_sql = f.read()
+
+        cur.execute(update_sql, (data["account_id"]))
 
         conn.commit()
         cur.close()

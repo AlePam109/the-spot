@@ -62,8 +62,6 @@ window.onload = () => {
                 postal_code: formData.get("postal_code"),
                 latitude: parseFloat(formData.get("latitude")),
                 longitude: parseFloat(formData.get("longitude")),
-                stars: parseFloat(formData.get("stars")),
-                review_count: parseInt(formData.get("review_count")),
                 is_open: formData.get("is_open") === "true",
                 attributes: JSON.parse(formData.get("attributes")),
                 categories: formData.get("categories").split(",").map(x => x.trim()),
