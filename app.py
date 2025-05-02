@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import psycopg2
+from psycopg2.extras import Json
 import os
 
 app = Flask(__name__)
@@ -218,19 +219,155 @@ def api_create_customer_account():
 # ===== BUSINESS ACCOUNT =====
 @app.route("/api/businesses", methods=["GET"])
 def api_get_my_businesses():
-    return jsonify({"businesses": []})
+    account_id = request.args.get("accountId")
+
+    if not account_id:
+        return jsonify(success=False, error="Missing account ID")
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/business/get_my_businesses.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (account_id,))
+        rows = cur.fetchall()
+
+        businesses = []
+        for row in rows:
+            businesses.append({
+                "business_id": row[0],
+                "name": row[1],
+                "address": row[2],
+                "is_open": row[3],
+                "stars": row[4]
+            })
+
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, businesses=businesses)
+
+    except Exception as e:
+        print("Error in get_my_businesses:", e)
+        return jsonify(success=False, error="Internal server error")
+
 
 @app.route("/api/business", methods=["GET"])
 def api_get_business():
-    return jsonify({"details": {}})
+    account_id = request.args.get("accountId")
+    business_id = request.args.get("businessId")
+
+    if not account_id or not business_id:
+        return jsonify(success=False, error="Missing parameters")
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/business/get_business_by_id.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (business_id, account_id))
+        row = cur.fetchone()
+
+        if not row:
+            return jsonify(success=False, error="Business not found")
+
+        # Adjust keys based on SELECT * column order
+        colnames = [desc[0] for desc in cur.description]
+        details = dict(zip(colnames, row))
+
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, details=details)
+
+    except Exception as e:
+        print("Error in get_business:", e)
+        return jsonify(success=False, error="Internal server error")
+
+
 
 @app.route("/api/business/update", methods=["POST"])
 def api_update_business():
-    return jsonify({"success": False})
+    data = request.get_json()
+    required_fields = [
+        "business_id", "account_id", "name", "address", "city", "state",
+        "postal_code", "latitude", "longitude", "stars", "review_count",
+        "is_open", "attributes", "categories", "hours"
+    ]
+
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing fields")
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/business/update_business.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (
+            data["name"], data["address"], data["city"], data["state"],
+            data["postal_code"], data["latitude"], data["longitude"],
+            data["stars"], data["review_count"], data["is_open"],
+            Json(data["attributes"]), data["categories"], Json(data["hours"]),
+            data["business_id"], data["account_id"]
+        ))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        print("Error in update_business:", e)
+        return jsonify(success=False, error="Internal server error")
+
 
 @app.route("/api/business/create", methods=["POST"])
 def api_create_business():
-    return jsonify({"success": False})
+    from utils.generate_user_id import generate_user_id as gen_biz_id  # reuse for business_id
+
+    data = request.get_json()
+    required_fields = [
+        "account_id", "name", "address", "city", "state", "postal_code",
+        "latitude", "longitude", "stars", "review_count", "is_open",
+        "attributes", "categories", "hours"
+    ]
+
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing fields")
+
+    business_id = gen_biz_id()
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/business/create_business.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (
+            business_id, data["name"], data["address"], data["city"], data["state"],
+            data["postal_code"], data["latitude"], data["longitude"],
+            data["stars"], data["review_count"], data["is_open"],
+            Json(data["attributes"]), data["categories"], Json(data["hours"]),
+            data["account_id"]
+        ))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, business_id=business_id)
+
+    except Exception as e:
+        print("Error in create_business:", e)
+        return jsonify(success=False, error="Internal server error")
 
 
 # ===== USER ACCOUNT =====
