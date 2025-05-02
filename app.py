@@ -151,7 +151,7 @@ def api_create_business_account():
 
         with open("database/login/insert_business_user.sql", "r") as f:
             sql = f.read()
-        cur.execute(sql, (username, name, username, password, username))
+        cur.execute(sql, (name, username, password, username))
         result = cur.fetchone()
         conn.commit()
         cur.close()
