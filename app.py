@@ -140,7 +140,16 @@ def api_create_business_account():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        with open("database/login/create_business.sql", "r") as f:
+        with open("database/login/check_business_user_exists.sql", "r") as f:
+            check_sql = f.read()
+        cur.execute(check_sql, (username,))
+        exists = cur.fetchone()
+        if exists:
+            cur.close()
+            conn.close()
+            return jsonify(success=False, error="Username already exists")
+
+        with open("database/login/insert_business.sql", "r") as f:
             sql = f.read()
         cur.execute(sql, (username, name, username, password, username))
         result = cur.fetchone()
@@ -177,9 +186,19 @@ def api_create_customer_account():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        with open("database/login/create_user.sql", "r") as f:
-            sql = f.read()
-        cur.execute(sql, (username, user_id, name, username, password, username))
+        with open("database/login/check_user_exists.sql", "r") as f:
+            check_sql = f.read()
+        cur.execute(check_sql, (username,))
+        exists = cur.fetchone()
+        if exists:
+            cur.close()
+            conn.close()
+            return jsonify(success=False, error="Username already exists")
+
+
+        with open("database/login/insert_user.sql", "r") as f:
+            insert_sql = f.read()
+        cur.execute(insert_sql, (user_id, name, username, password))
         result = cur.fetchone()
         conn.commit()
         cur.close()
@@ -188,7 +207,7 @@ def api_create_customer_account():
         if result and len(result) > 0:
             return jsonify(success=True, user_id=result[0])
         else:
-            return jsonify(success=False, error="Username already exists")
+            return jsonify(success=False, error="Account creation failure")
         
 
     except Exception as e:
