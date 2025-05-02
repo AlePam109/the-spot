@@ -1,36 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create Account</title>
-    <script defer src="/static/login.js"></script>
-</head>
-<body>
-    <h2>Create Account</h2>
+{% extends "base.html" %}
 
-    <label>
-        <input type="radio" name="accountType" value="customer" checked>
-        Customer
-    </label>
-    <label>
-        <input type="radio" name="accountType" value="business">
-        Business
-    </label>
-    <br><br>
+{% block title %}Create Account - The Spot{% endblock %}
 
-    <label for="name">Full Name:</label><br>
-    <input type="text" id="name"><br>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <h2 class="mb-3">Create Your Account</h2>
+                <p class="text-muted">Join The Spot community today</p>
+            </div>
 
-    <label for="username">Username:</label><br>
-    <input type="text" id="username"><br>
+            <div class="text-center mb-4">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="accountType" id="customer" value="customer" checked>
+                    <label class="btn btn-outline-primary" for="customer">
+                        <i class="fas fa-user me-2"></i>Customer Account
+                    </label>
 
-    <label for="password">Password:</label><br>
-    <input type="password" id="password"><br><br>
+                    <input type="radio" class="btn-check" name="accountType" id="business" value="business">
+                    <label class="btn btn-outline-primary" for="business">
+                        <i class="fas fa-store me-2"></i>Business Account
+                    </label>
+                </div>
+            </div>
 
-    <button onclick="createAccount()">Create Account</button>
+            <form id="createAccountForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+                    </div>
+                </div>
 
-    <p id="status"></p>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
 
-    <p>Already have an account? <a href="/">Login here</a></p>
-</body>
-</html>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" placeholder="Create a password" required>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="mb-0">Already have an account? <a href="/" class="text-decoration-none">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .btn-check:checked + .btn-outline-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        color: white;
+    }
+
+    .input-group-text {
+        background-color: var(--light-color);
+        border: none;
+        color: var(--primary-color);
+    }
+
+    .form-control {
+        border-left: none;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #ddd;
+    }
+
+    .btn-primary {
+        padding: 12px;
+        font-weight: 500;
+    }
+</style>
+
+<script>
+    document.getElementById('createAccountForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const accountType = document.querySelector('input[name="accountType"]:checked').value;
+        const name = document.getElementById('name').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Add your account creation logic here
+        console.log('Account creation attempt:', { accountType, name, username, password });
+    });
+</script>
+{% endblock %}
