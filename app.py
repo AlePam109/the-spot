@@ -161,6 +161,7 @@ def api_create_business_account():
 @app.route("/api/login/create-customer", methods=["POST"])
 def api_create_customer_account():
     from utils.hash_password import hash_password
+    from utils.generate_user_id import generate_user_id
     data = request.get_json()
 
     required_fields = ["username", "password", "name"]
@@ -170,6 +171,7 @@ def api_create_customer_account():
     username = data["username"]
     password = hash_password(data["password"])
     name = data["name"]
+    user_id = generate_user_id()
 
     try:
         conn = get_db_connection()
@@ -177,7 +179,7 @@ def api_create_customer_account():
 
         with open("database/login/create_user.sql", "r") as f:
             sql = f.read()
-        cur.execute(sql, (username, name, username, password, username))
+        cur.execute(sql, (username, user_id, name, username, password))
         result = cur.fetchone()
         conn.commit()
         cur.close()

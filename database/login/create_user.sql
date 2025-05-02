@@ -6,8 +6,8 @@ FROM yelp_user
 WHERE username = %s;
 
 -- If no match, insert new user
-INSERT INTO yelp_user (name, username, password, yelping_since)
-SELECT %s, %s, %s, CURRENT_DATE
+INSERT INTO yelp_user (user_id, name, username, password, yelping_since)
+SELECT %s, %s, %s, %s, CURRENT_DATE
 WHERE NOT EXISTS (
     SELECT 1 FROM yelp_user WHERE username = %s
 )
