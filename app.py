@@ -142,13 +142,13 @@ def api_create_business_account():
 
         with open("database/login/create_business.sql", "r") as f:
             sql = f.read()
-        cur.execute(sql, (username, name, username, password))
+        cur.execute(sql, (username, name, username, password, username))
         result = cur.fetchone()
         conn.commit()
         cur.close()
         conn.close()
 
-        if result:
+        if result and len(result) > 0:
             return jsonify(success=True, account_id=result[0])
         else:
             return jsonify(success=False, error="Username already exists")
@@ -179,16 +179,17 @@ def api_create_customer_account():
 
         with open("database/login/create_user.sql", "r") as f:
             sql = f.read()
-        cur.execute(sql, (username, user_id, name, username, password))
+        cur.execute(sql, (username, user_id, name, username, password, username))
         result = cur.fetchone()
         conn.commit()
         cur.close()
         conn.close()
 
-        if result:
+        if result and len(result) > 0:
             return jsonify(success=True, user_id=result[0])
         else:
             return jsonify(success=False, error="Username already exists")
+        
 
     except Exception as e:
         print("Create user error:", e)
