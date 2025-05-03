@@ -213,7 +213,7 @@
     <div class="login-container">
         <div class="login-header">
             <h1><i class="fas fa-store me-2"></i>The Spot</h1>
-            <p>Welcome back! Please login to continue.</p>
+            <p id="welcomeText">Welcome back! Please login to continue.</p>
         </div>
 
         <div class="account-type-toggle">
@@ -259,11 +259,20 @@
                     // Update theme based on account type
                     body.classList.remove('business-theme', 'customer-theme');
                     body.classList.add(currentAccountType + '-theme');
+
+                    // Update welcome text based on account type
+                    const welcomeText = document.getElementById('welcomeText');
+                    if (currentAccountType === 'business') {
+                        welcomeText.textContent = 'Welcome back, business owner! Please login to manage your businesses.';
+                    } else {
+                        welcomeText.textContent = 'Welcome back! Please login to continue.';
+                    }
                 });
             });
 
-            // Set initial theme
+            // Set initial theme and welcome text
             body.classList.add('customer-theme');
+            document.getElementById('welcomeText').textContent = 'Welcome back! Please login to continue.';
 
             // Handle form submission
             form.addEventListener('submit', async function(e) {

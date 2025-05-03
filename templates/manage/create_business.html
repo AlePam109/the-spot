@@ -190,6 +190,7 @@
                 } catch (error) {
                     errorMessage.textContent = 'An error occurred while creating the business';
                     errorMessage.style.display = 'block';
+                    console.error('Error:', error);
                 }
             });
         });

@@ -384,7 +384,7 @@ def api_create_business():
         with open("database/business/update_num_businesses.sql", "r") as f:
             update_sql = f.read()
 
-        cur.execute(update_sql, (data["account_id"]))
+        cur.execute(update_sql, (data["account_id"],))
 
         conn.commit()
         cur.close()
