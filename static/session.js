@@ -1,16 +1,23 @@
 export function getSession() {
-    return {
-        accountType: localStorage.getItem("accountType"),
-        accountId: localStorage.getItem("accountId")
-    };
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+        return JSON.parse(userData);
+    }
+    return null;
 }
 
 export function isLoggedIn() {
-    const { accountType, accountId } = getSession();
-    return accountType && accountId;
+    return getSession() !== null;
 }
 
 export function clearSession() {
-    localStorage.removeItem("accountType");
-    localStorage.removeItem("accountId");
+    localStorage.removeItem('userData');
+    window.location.href = '/';
 }
+
+export function setSession(userData) {
+    localStorage.setItem('userData', JSON.stringify(userData));
+}
+
+// Make logout function available globally
+window.logout = clearSession;

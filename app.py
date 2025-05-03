@@ -742,6 +742,37 @@ def api_get_activity():
         print("Error in get_activity:", e)
         return jsonify(success=False, error="Internal server error")
 
+@app.route("/api/business/tips", methods=["GET"])
+def api_get_business_tips():
+    business_id = request.args.get("businessId")
+    
+    if not business_id:
+        return jsonify(success=False, error="Missing business ID")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/review/review_queries.sql", "r") as f:
+            sql = f.read().split(';')[5]  # Get the tips query
+        
+        cur.execute(sql, (business_id,))
+        rows = cur.fetchall()
+        
+        tips = []
+        for row in rows:
+            colnames = [desc[0] for desc in cur.description]
+            tips.append(dict(zip(colnames, row)))
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True, tips=tips)
+        
+    except Exception as e:
+        print("Error in get_business_tips:", e)
+        return jsonify(success=False, error="Internal server error")
+
 
 # === Run the app ===
 if __name__ == "__main__":
