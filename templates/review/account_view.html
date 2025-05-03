@@ -100,15 +100,14 @@
 </head>
 <body>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="/search" class="btn btn-outline-primary">
-                <i class="fas fa-home me-2"></i>Home
-            </a>
-            <h2>Account Management</h2>
-            <div style="width: 100px;"></div> <!-- Spacer for alignment -->
-        </div>
-        
         <div class="account-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Account Management</h2>
+                <a href="/search" class="btn btn-outline-primary">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+            </div>
+            
             <ul class="nav nav-tabs" id="accountTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
@@ -204,9 +203,9 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        document.getElementById('username').value = data.username;
-                        document.getElementById('name').value = data.name;
-                        document.getElementById('yelpingSince').value = new Date(data.yelping_since).toLocaleDateString();
+                        document.getElementById('username').value = data.profile.username;
+                        document.getElementById('name').value = data.profile.name;
+                        document.getElementById('yelpingSince').value = new Date(data.profile.yelping_since).toLocaleDateString();
                     } else {
                         showError('Failed to load profile information');
                     }

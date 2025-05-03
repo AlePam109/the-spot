@@ -542,31 +542,31 @@ def api_review_reaction():
 @app.route("/api/account", methods=["GET"])
 def api_get_account():
     user_id = request.args.get("userId")
+    
     if not user_id:
         return jsonify(success=False, error="Missing user ID")
-
+    
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-
+        
         with open("database/account/account_queries.sql", "r") as f:
-            sql = f.read()
+            sql = f.read().split(';')[0]  # Get the first query (get profile)
+        
         cur.execute(sql, (user_id,))
-        result = cur.fetchone()
+        row = cur.fetchone()
         cur.close()
         conn.close()
-
-        if result:
-            return jsonify(success=True, 
-                         user_id=result[0],
-                         username=result[1],
-                         name=result[2],
-                         yelping_since=result[3].strftime("%Y-%m-%d"))
+        
+        if row:
+            colnames = [desc[0] for desc in cur.description]
+            profile = dict(zip(colnames, row))
+            return jsonify(success=True, profile=profile)
         else:
             return jsonify(success=False, error="User not found")
-
+            
     except Exception as e:
-        print("Get account error:", e)
+        print("Error in get_account:", e)
         return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/account/update", methods=["POST"])
