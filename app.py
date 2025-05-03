@@ -541,7 +541,167 @@ def api_review_reaction():
 
 @app.route("/api/account", methods=["GET"])
 def api_get_account():
-    return jsonify({"info": {}})
+    user_id = request.args.get("userId")
+    
+    if not user_id:
+        return jsonify(success=False, error="Missing user ID")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/account/account_queries.sql", "r") as f:
+            sql = f.read().split(';')[0]  # Get the first query (get profile)
+        
+        cur.execute(sql, (user_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if row:
+            colnames = [desc[0] for desc in cur.description]
+            profile = dict(zip(colnames, row))
+            return jsonify(success=True, profile=profile)
+        else:
+            return jsonify(success=False, error="User not found")
+            
+    except Exception as e:
+        print("Error in get_account:", e)
+        return jsonify(success=False, error="Internal server error")
+
+@app.route("/api/account/update", methods=["POST"])
+def api_update_account():
+    data = request.get_json()
+    required_fields = ["user_id", "name", "email"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/account/account_queries.sql", "r") as f:
+            sql = f.read().split(';')[1]  # Get the update profile query
+        
+        cur.execute(sql, (data["name"], data["email"], data["user_id"]))
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        if result:
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, error="User not found")
+            
+    except Exception as e:
+        print("Error in update_account:", e)
+        return jsonify(success=False, error="Internal server error")
+
+@app.route("/api/account/password", methods=["POST"])
+def api_change_password():
+    from utils.hash_password import hash_password
+    data = request.get_json()
+    required_fields = ["user_id", "current_password", "new_password"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/account/account_queries.sql", "r") as f:
+            sql = f.read().split(';')[2]  # Get the change password query
+        
+        cur.execute(sql, (
+            hash_password(data["new_password"]),
+            data["user_id"],
+            hash_password(data["current_password"])
+        ))
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        if result:
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, error="Invalid current password")
+            
+    except Exception as e:
+        print("Error in change_password:", e)
+        return jsonify(success=False, error="Internal server error")
+
+@app.route("/api/account/delete", methods=["POST"])
+def api_delete_account():
+    data = request.get_json()
+    required_fields = ["user_id"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/account/account_queries.sql", "r") as f:
+            sql = f.read().split(';')[3]  # Get the delete account query
+        
+        cur.execute(sql, (data["user_id"],))
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        if result:
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, error="User not found")
+            
+    except Exception as e:
+        print("Error in delete_account:", e)
+        return jsonify(success=False, error="Internal server error")
+
+@app.route("/api/account/activity", methods=["GET"])
+def api_get_activity():
+    user_id = request.args.get("userId")
+    
+    if not user_id:
+        return jsonify(success=False, error="Missing user ID")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/account/account_queries.sql", "r") as f:
+            queries = f.read().split(';')
+            reviews_sql = queries[4]  # Get user reviews query
+            tips_sql = queries[5]     # Get user tips query
+        
+        # Get reviews
+        cur.execute(reviews_sql, (user_id,))
+        reviews = []
+        for row in cur.fetchall():
+            colnames = [desc[0] for desc in cur.description]
+            reviews.append(dict(zip(colnames, row)))
+        
+        # Get tips
+        cur.execute(tips_sql, (user_id,))
+        tips = []
+        for row in cur.fetchall():
+            colnames = [desc[0] for desc in cur.description]
+            tips.append(dict(zip(colnames, row)))
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True, reviews=reviews, tips=tips)
+            
+    except Exception as e:
+        print("Error in get_activity:", e)
+        return jsonify(success=False, error="Internal server error")
 
 
 # === Run the app ===

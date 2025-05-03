@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Management - The Spot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #34495E;
+            --accent-color: #3498DB;
+            --light-color: #ECF0F1;
+            --success-color: #2ECC71;
+            --warning-color: #F1C40F;
+            --danger-color: #E74C3C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .account-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980B9;
+            border-color: #2980B9;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-danger:hover {
+            background-color: #C0392B;
+            border-color: #C0392B;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--secondary-color);
+            border: none;
+            padding: 1rem;
+            margin-right: 1rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            background: none;
+        }
+
+        .tab-content {
+            padding: 2rem 0;
+        }
+
+        .activity-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="account-container">
+            <h2>Account Management</h2>
+            
+            <ul class="nav nav-tabs" id="accountTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">Security</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="accountTabsContent">
+                <!-- Profile Tab -->
+                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <form id="passwordForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                    <hr>
+                    <div class="mt-4">
+                        <h5>Delete Account</h5>
+                        <p class="text-danger">Warning: This action cannot be undone.</p>
+                        <button class="btn btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
+                    </div>
+                </div>
+
+                <!-- Activity Tab -->
+                <div class="tab-pane fade" id="activity" role="tabpanel">
+                    <div id="reviewsList">
+                        <h4>Your Reviews</h4>
+                        <div id="userReviews"></div>
+                    </div>
+                    <div id="tipsList" class="mt-4">
+                        <h4>Your Tips</h4>
+                        <div id="userTips"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            if (!userData.id) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Load user profile
+            async function loadProfile() {
+                try {
+                    const response = await fetch(`/api/account?userId=${userData.id}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('username').value = data.profile.username;
+                        document.getElementById('name').value = data.profile.name;
+                        document.getElementById('email').value = data.profile.email;
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                }
+            }
+
+            // Load user activity
+            async function loadActivity() {
+                try {
+                    const response = await fetch(`/api/account/activity?userId=${userData.id}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Display reviews
+                        const reviewsList = document.getElementById('userReviews');
+                        reviewsList.innerHTML = data.reviews.map(review => `
+                            <div class="activity-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>${review.business_name}</h5>
+                                    <div class="star-rating">
+                                        ${Array(5).fill().map((_, i) => 
+                                            i < review.stars ? 
+                                            '<i class="fas fa-star"></i>' : 
+                                            '<i class="far fa-star"></i>'
+                                        ).join('')}
+                                    </div>
+                                </div>
+                                <p>${review.text}</p>
+                                <small class="text-muted">${new Date(review.date).toLocaleDateString()}</small>
+                            </div>
+                        `).join('');
+
+                        // Display tips
+                        const tipsList = document.getElementById('userTips');
+                        tipsList.innerHTML = data.tips.map(tip => `
+                            <div class="activity-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>${tip.business_name}</h5>
+                                    <span class="text-muted">
+                                        <i class="fas fa-heart"></i> ${tip.compliment_count}
+                                    </span>
+                                </div>
+                                <p>${tip.text}</p>
+                                <small class="text-muted">${new Date(tip.date).toLocaleDateString()}</small>
+                            </div>
+                        `).join('');
+                    }
+                } catch (error) {
+                    console.error('Error loading activity:', error);
+                }
+            }
+
+            // Handle profile update
+            document.getElementById('profileForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const body = {
+                    user_id: userData.id,
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value
+                };
+
+                try {
+                    const response = await fetch('/api/account/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('Profile updated successfully');
+                    } else {
+                        alert(data.error || 'Failed to update profile');
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    alert('An error occurred while updating your profile');
+                }
+            });
+
+            // Handle password change
+            document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match');
+                    return;
+                }
+
+                const body = {
+                    user_id: userData.id,
+                    current_password: document.getElementById('currentPassword').value,
+                    new_password: newPassword
+                };
+
+                try {
+                    const response = await fetch('/api/account/password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('Password changed successfully');
+                        this.reset();
+                    } else {
+                        alert(data.error || 'Failed to change password');
+                    }
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    alert('An error occurred while changing your password');
+                }
+            });
+
+            // Load initial data
+            loadProfile();
+            loadActivity();
+        });
+
+        function confirmDeleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                deleteAccount();
+            }
+        }
+
+        async function deleteAccount() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            try {
+                const response = await fetch('/api/account/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userData.id
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.removeItem('userData');
+                    window.location.href = '/';
+                } else {
+                    alert(data.error || 'Failed to delete account');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('An error occurred while deleting your account');
+            }
+        }
+    </script>
+</body>
+</html>
