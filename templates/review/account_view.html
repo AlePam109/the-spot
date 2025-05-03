@@ -185,6 +185,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             
+            console.log('User data from localStorage:', userData);
+            
             if (!userData.id) {
                 window.location.href = '/';
                 return;
@@ -199,8 +201,10 @@
             // Load user profile
             async function loadProfile() {
                 try {
+                    console.log('Fetching profile for user ID:', userData.id);
                     const response = await fetch(`/api/account?userId=${userData.id}`);
                     const data = await response.json();
+                    console.log('Profile response:', data);
                     
                     if (data.success) {
                         document.getElementById('username').value = data.profile.username;
