@@ -8,20 +8,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            /* Business theme: dark blue - silver */
-            --business-primary: #1A237E;
-            --business-secondary: #283593;
-            --business-accent: #5C6BC0;
-            --business-light: #E8EAF6;
-            --business-dark: #0D1B2A;
-            --business-silver: #B0BEC5;
+            /* Business theme: Elegant Navy & Gold */
+            --business-primary: #1B2631;    /* Deep Navy */
+            --business-secondary: #2C3E50;  /* Darker Navy */
+            --business-accent: #7F8C8D;     /* Elegant Gray */
+            --business-light: #F5F6FA;      /* Light Gray */
+            --business-dark: #17202A;       /* Darker Navy */
+            --business-gold: #B8860B;       /* Elegant Gold */
+            --business-silver: #BDC3C7;     /* Silver Gray */
 
-            /* Customer theme: AMEX gold */
-            --customer-primary: #D4AF37;
-            --customer-secondary: #FFD700;
-            --customer-accent: #FFC107;
-            --customer-light: #FFF8E1;
-            --customer-dark: #B8860B;
+            /* Customer theme: Fresh & Modern */
+            --customer-primary: #2ECC71;    /* Fresh Green */
+            --customer-secondary: #27AE60;  /* Darker Green */
+            --customer-accent: #3498DB;     /* Bright Blue */
+            --customer-light: #ECF0F1;      /* Light Gray */
+            --customer-dark: #16A085;       /* Teal */
+            --customer-yellow: #F1C40F;     /* Sunny Yellow */
 
             /* Default theme */
             --primary-color: #2C3E50;
@@ -37,11 +39,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-color);
             color: var(--primary-color);
+            transition: background-color 0.3s ease;
         }
 
         .navbar {
             background-color: var(--primary-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
         }
 
         .navbar-brand {
@@ -51,6 +55,7 @@
 
         .nav-link {
             color: rgba(255,255,255,0.8) !important;
+            transition: color 0.3s ease;
         }
 
         .nav-link:hover {
@@ -60,6 +65,7 @@
         .btn-primary {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
@@ -71,7 +77,7 @@
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.3s ease;
         }
 
         .card:hover {
@@ -82,6 +88,7 @@
             border-radius: 8px;
             border: 1px solid #ddd;
             padding: 10px;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
@@ -94,6 +101,7 @@
             color: white;
             padding: 20px 0;
             margin-top: 50px;
+            transition: background-color 0.3s ease;
         }
 
         /* Business-specific styles */
@@ -106,11 +114,12 @@
         }
 
         .business-nav .nav-link:hover {
-            color: white !important;
+            color: var(--business-gold) !important;
         }
 
         .business-theme {
             background-color: var(--business-light);
+            color: var(--business-dark);
         }
 
         .business-theme .card {
@@ -119,18 +128,25 @@
         }
 
         .business-theme .card-header {
-            background-color: var(--business-secondary);
-            color: white;
+            background-color: var(--business-primary);
+            color: var(--business-gold);
         }
 
         .business-theme .btn-primary {
             background-color: var(--business-accent);
             border-color: var(--business-accent);
+            color: var(--business-dark);
         }
 
         .business-theme .btn-primary:hover {
             background-color: var(--business-secondary);
             border-color: var(--business-secondary);
+            color: var(--business-gold);
+        }
+
+        .business-theme .form-control:focus {
+            border-color: var(--business-accent);
+            box-shadow: 0 0 0 0.2rem rgba(127, 140, 141, 0.25);
         }
 
         /* Customer-specific styles */
@@ -143,11 +159,12 @@
         }
 
         .customer-nav .nav-link:hover {
-            color: white !important;
+            color: var(--customer-yellow) !important;
         }
 
         .customer-theme {
             background-color: var(--customer-light);
+            color: var(--customer-dark);
         }
 
         .customer-theme .card {
@@ -163,13 +180,27 @@
         .customer-theme .btn-primary {
             background-color: var(--customer-accent);
             border-color: var(--customer-accent);
-            color: var(--customer-dark);
+            color: white;
         }
 
         .customer-theme .btn-primary:hover {
             background-color: var(--customer-secondary);
             border-color: var(--customer-secondary);
-            color: var(--customer-dark);
+        }
+
+        .customer-theme .form-control:focus {
+            border-color: var(--customer-accent);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .business-theme .footer {
+            background-color: var(--business-primary);
+            color: var(--business-gold);
+        }
+
+        .customer-theme .footer {
+            background-color: var(--customer-primary);
+            color: white;
         }
     </style>
 </head>
