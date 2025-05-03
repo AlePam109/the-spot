@@ -1,357 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Details - The Spot</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2C3E50;
-            --secondary-color: #34495E;
-            --accent-color: #3498DB;
-            --light-color: #ECF0F1;
-            --success-color: #2ECC71;
-            --warning-color: #F1C40F;
-            --danger-color: #E74C3C;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-color);
-            color: var(--primary-color);
-        }
+{% block title %}Business Details - The Spot{% endblock %}
 
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .navbar-brand {
-            color: white !important;
-            font-weight: bold;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.8) !important;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-        }
-
-        .business-header {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .review-section, .tip-section {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .star-rating {
-            color: var(--warning-color);
-            font-size: 1.5rem;
-        }
-
-        .review-card, .tip-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 1rem;
-            padding: 1rem;
-        }
-
-        .reaction-btn {
-            background: none;
-            border: none;
-            color: var(--secondary-color);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .reaction-btn:hover {
-            color: var(--accent-color);
-        }
-
-        .reaction-count {
-            font-size: 0.9rem;
-            color: var(--secondary-color);
-        }
-
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 1rem;
-        }
-
-        .form-control:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            border-radius: 8px;
-            padding: 10px;
-        }
-
-        .btn-primary:hover {
-            background-color: #2980B9;
-            border-color: #2980B9;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/search">
-                <i class="fas fa-store me-2"></i>The Spot
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto" id="navLinks">
-                    <!-- Navigation links will be populated by JavaScript -->
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <div class="business-header">
+{% block content %}
+    <div class="business-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 id="businessName"></h1>
-            <div class="d-flex align-items-center mb-3">
-                <div class="star-rating me-2" id="businessStars"></div>
-                <span id="reviewCount"></span>
-            </div>
-            <p id="businessAddress"></p>
-            <p id="businessStatus"></p>
-        </div>
-
-        <div class="review-section">
-            <h2>Reviews</h2>
-            <div id="reviewsList"></div>
-            
-            <div id="reviewForm" class="mt-4">
-                <h3>Write a Review</h3>
-                <form id="submitReviewForm">
-                    <div class="mb-3">
-                        <label for="stars" class="form-label">Rating</label>
-                        <select class="form-control" id="stars" name="stars" required>
-                            <option value="5">5 Stars</option>
-                            <option value="4">4 Stars</option>
-                            <option value="3">3 Stars</option>
-                            <option value="2">2 Stars</option>
-                            <option value="1">1 Star</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="reviewText" class="form-label">Your Review</label>
-                        <textarea class="form-control" id="reviewText" name="text" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </form>
+            <div>
+                <span id="businessStatus" class="badge"></span>
+                <span id="businessStars" class="stars ms-2"></span>
             </div>
         </div>
-
-        <div class="tip-section">
-            <h2>Tips</h2>
-            <div id="tipsList"></div>
-            
-            <div id="tipForm" class="mt-4">
-                <h3>Add a Tip</h3>
-                <form id="submitTipForm">
-                    <div class="mb-3">
-                        <label for="tipText" class="form-label">Your Tip</label>
-                        <textarea class="form-control" id="tipText" name="text" rows="3" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Tip</button>
-                </form>
+        <div class="row">
+            <div class="col-md-6">
+                <p id="businessAddress"></p>
+                <p id="businessCityState"></p>
+                <p id="businessHours"></p>
+            </div>
+            <div class="col-md-6">
+                <h5>Attributes</h5>
+                <div id="businessAttributes"></div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <div class="review-section">
+        <h3>Reviews</h3>
+        <div id="reviewsList"></div>
+    </div>
+
+    <div class="tip-section">
+        <h3>Tips</h3>
+        <div id="tipsList"></div>
+    </div>
+
+    <script type="module">
+        import { getSession } from '/static/session.js';
+
         document.addEventListener('DOMContentLoaded', function() {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            const businessId = new URLSearchParams(window.location.search).get('businessId');
-            const nav = document.getElementById('navLinks');
-            
-            // Update navigation based on account type
-            if (userData.accountType === 'business') {
-                nav.innerHTML = `
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manage">
-                            <i class="fas fa-briefcase me-1"></i>Manage Businesses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/search">
-                            <i class="fas fa-search me-1"></i>Search
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/account">
-                            <i class="fas fa-user me-1"></i>${userData.username}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout()">
-                            <i class="fas fa-sign-out-alt me-1"></i>Logout
-                        </a>
-                    </li>
-                `;
-            } else if (userData.accountType === 'customer') {
-                nav.innerHTML = `
-                    <li class="nav-item">
-                        <a class="nav-link" href="/search">
-                            <i class="fas fa-search me-1"></i>Search
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/account">
-                            <i class="fas fa-user me-1"></i>${userData.username}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout()">
-                            <i class="fas fa-sign-out-alt me-1"></i>Logout
-                        </a>
-                    </li>
-                `;
-            } else {
-                nav.innerHTML = `
-                    <li class="nav-item">
-                        <a class="nav-link" href="/search">
-                            <i class="fas fa-search me-1"></i>Search
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/create-account">
-                            <i class="fas fa-user-plus me-1"></i>Create Account
-                        </a>
-                    </li>
-                `;
+            const userData = getSession();
+            const urlParams = new URLSearchParams(window.location.search);
+            const businessId = urlParams.get('businessId');
+
+            if (!businessId) {
+                window.location.href = '/search';
+                return;
             }
 
-            // Hide forms if user is not logged in
-            if (!userData.accountType || userData.accountType !== 'customer') {
-                document.getElementById('reviewForm').style.display = 'none';
-                document.getElementById('tipForm').style.display = 'none';
-            }
-
-            // Load business details
             async function loadBusinessDetails() {
                 try {
-                    const response = await fetch(`/api/business?businessId=${businessId}`);
+                    const response = await fetch(`/api/business/${businessId}`);
                     const data = await response.json();
                     
                     if (data.success) {
-                        const business = data.details;
-                        document.getElementById('businessName').textContent = business.name;
-                        document.getElementById('businessAddress').textContent = `${business.address}, ${business.city}, ${business.state} ${business.postal_code}`;
-                        document.getElementById('businessStatus').textContent = business.is_open ? 'Open' : 'Closed';
-                        document.getElementById('businessStatus').className = business.is_open ? 'badge bg-success' : 'badge bg-danger';
+                        const business = data.business;
                         
-                        // Display categories
-                        const categoriesContainer = document.getElementById('businessCategories');
-                        categoriesContainer.innerHTML = business.categories.map(cat => 
-                            `<span class="badge bg-secondary me-2">${cat}</span>`
+                        // Update business header
+                        document.getElementById('businessName').textContent = business.name;
+                        document.getElementById('businessStatus').textContent = business.is_open ? 'Open' : 'Closed';
+                        document.getElementById('businessStatus').classList.add(business.is_open ? 'bg-success' : 'bg-danger');
+                        
+                        // Update stars
+                        const starsContainer = document.getElementById('businessStars');
+                        starsContainer.innerHTML = Array(5).fill().map((_, i) => 
+                            i < business.stars ? 
+                            '<i class="fas fa-star"></i>' : 
+                            '<i class="far fa-star"></i>'
                         ).join('');
                         
-                        // Display stars
-                        const starsContainer = document.getElementById('businessStars');
-                        starsContainer.innerHTML = '';
-                        for (let i = 0; i < 5; i++) {
-                            starsContainer.innerHTML += i < business.stars ? 
-                                '<i class="fas fa-star text-warning"></i>' : 
-                                '<i class="far fa-star text-warning"></i>';
-                        }
-                        starsContainer.innerHTML += ` <span class="ms-2">(${business.review_count} reviews)</span>`;
-                        
-                        // Display hours if available
-                        const hoursContainer = document.getElementById('businessHours');
-                        if (business.hours) {
-                            const hoursList = document.createElement('ul');
-                            hoursList.className = 'list-unstyled';
-                            for (const [day, hours] of Object.entries(business.hours)) {
-                                const li = document.createElement('li');
-                                li.innerHTML = `<strong>${day}:</strong> ${hours}`;
-                                hoursList.appendChild(li);
-                            }
-                            hoursContainer.appendChild(hoursList);
-                        } else {
-                            hoursContainer.innerHTML = '<p>Hours not available</p>';
-                        }
-                    } else {
-                        document.getElementById('businessDetails').innerHTML = `
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Business not found'}
-                            </div>
+                        // Update address and location
+                        document.getElementById('businessAddress').innerHTML = `
+                            <i class="fas fa-map-marker-alt me-2"></i>${business.address}
                         `;
+                        document.getElementById('businessCityState').textContent = `${business.city}, ${business.state}`;
+                        
+                        // Update hours
+                        const hours = JSON.parse(business.hours);
+                        document.getElementById('businessHours').innerHTML = `
+                            <h5>Hours</h5>
+                            ${Object.entries(hours).map(([day, time]) => `
+                                <p class="mb-1">${day}: ${time}</p>
+                            `).join('')}
+                        `;
+                        
+                        // Update attributes
+                        const attributes = JSON.parse(business.attributes);
+                        document.getElementById('businessAttributes').innerHTML = Object.entries(attributes)
+                            .map(([key, value]) => `
+                                <p class="mb-1">
+                                    <strong>${key}:</strong> ${value}
+                                </p>
+                            `).join('');
                     }
                 } catch (error) {
                     console.error('Error loading business details:', error);
-                    document.getElementById('businessDetails').innerHTML = `
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i>An error occurred while loading business details
-                        </div>
-                    `;
                 }
             }
 
-            // Load reviews
             async function loadReviews() {
                 try {
-                    const response = await fetch(`/api/business/reviews?businessId=${businessId}`);
+                    const response = await fetch(`/api/business/${businessId}/reviews`);
                     const data = await response.json();
                     
                     if (data.success) {
                         const reviewsList = document.getElementById('reviewsList');
                         reviewsList.innerHTML = data.reviews.map(review => `
-                            <div class="review-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5>${review.user_name}</h5>
-                                    <div class="star-rating">
-                                        ${Array(5).fill().map((_, i) => 
-                                            i < review.stars ? 
-                                            '<i class="fas fa-star"></i>' : 
-                                            '<i class="far fa-star"></i>'
-                                        ).join('')}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title">${review.user_name}</h5>
+                                        <div class="stars">
+                                            ${Array(5).fill().map((_, i) => 
+                                                i < review.stars ? 
+                                                '<i class="fas fa-star"></i>' : 
+                                                '<i class="far fa-star"></i>'
+                                            ).join('')}
+                                        </div>
                                     </div>
-                                </div>
-                                <p>${review.text}</p>
-                                <div class="d-flex gap-3">
-                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'useful')">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <span class="reaction-count">${review.useful}</span>
-                                    </button>
-                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'funny')">
-                                        <i class="fas fa-laugh"></i>
-                                        <span class="reaction-count">${review.funny}</span>
-                                    </button>
-                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'cool')">
-                                        <i class="fas fa-cool"></i>
-                                        <span class="reaction-count">${review.cool}</span>
-                                    </button>
+                                    <p class="card-text">${review.text}</p>
+                                    <small class="text-muted">${new Date(review.date).toLocaleDateString()}</small>
                                 </div>
                             </div>
                         `).join('');
@@ -361,24 +128,25 @@
                 }
             }
 
-            // Load tips
             async function loadTips() {
                 try {
-                    const response = await fetch(`/api/business/tips?businessId=${businessId}`);
+                    const response = await fetch(`/api/business/${businessId}/tips`);
                     const data = await response.json();
                     
                     if (data.success) {
                         const tipsList = document.getElementById('tipsList');
                         tipsList.innerHTML = data.tips.map(tip => `
-                            <div class="tip-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5>${tip.user_name}</h5>
-                                    <button class="reaction-btn" onclick="praiseTip('${tip.tip_id}')">
-                                        <i class="fas fa-heart"></i>
-                                        <span class="reaction-count">${tip.compliment_count}</span>
-                                    </button>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title">${tip.user_name}</h5>
+                                        <span class="text-muted">
+                                            <i class="fas fa-heart"></i> ${tip.compliment_count}
+                                        </span>
+                                    </div>
+                                    <p class="card-text">${tip.text}</p>
+                                    <small class="text-muted">${new Date(tip.date).toLocaleDateString()}</small>
                                 </div>
-                                <p>${tip.text}</p>
                             </div>
                         `).join('');
                     }
@@ -387,149 +155,10 @@
                 }
             }
 
-            // Handle review submission
-            document.getElementById('submitReviewForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                const body = {
-                    user_id: userData.id,
-                    business_id: businessId,
-                    stars: parseInt(formData.get('stars')),
-                    text: formData.get('text')
-                };
-
-                try {
-                    const response = await fetch('/api/business/review', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                        this.reset();
-                        loadReviews();
-                    } else {
-                        alert(data.error || 'Failed to submit review');
-                    }
-                } catch (error) {
-                    console.error('Error submitting review:', error);
-                    alert('An error occurred while submitting the review');
-                }
-            });
-
-            // Handle tip submission
-            document.getElementById('submitTipForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                const body = {
-                    user_id: userData.id,
-                    business_id: businessId,
-                    text: formData.get('text')
-                };
-
-                try {
-                    const response = await fetch('/api/business/tip', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                        this.reset();
-                        loadTips();
-                    } else {
-                        alert(data.error || 'Failed to submit tip');
-                    }
-                } catch (error) {
-                    console.error('Error submitting tip:', error);
-                    alert('An error occurred while submitting the tip');
-                }
-            });
-
-            // Load initial data
+            // Load all data
             loadBusinessDetails();
             loadReviews();
             loadTips();
-
-            // Add logout function
-            window.logout = function() {
-                localStorage.removeItem('userData');
-                window.location.href = '/';
-            };
         });
-
-        // Handle review reactions
-        async function reactToReview(reviewId, reactionType) {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            if (!userData.id) {
-                alert('Please login to react to reviews');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/business/review-reaction', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user_id: userData.id,
-                        review_id: reviewId,
-                        reaction_type: reactionType
-                    })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    loadReviews();
-                } else {
-                    alert(data.error || 'Failed to react to review');
-                }
-            } catch (error) {
-                console.error('Error reacting to review:', error);
-                alert('An error occurred while reacting to the review');
-            }
-        }
-
-        // Handle tip praises
-        async function praiseTip(tipId) {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            if (!userData.id) {
-                alert('Please login to praise tips');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/business/tip-praise', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user_id: userData.id,
-                        tip_id: tipId
-                    })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    loadTips();
-                } else {
-                    alert(data.error || 'Failed to praise tip');
-                }
-            } catch (error) {
-                console.error('Error praising tip:', error);
-                alert('An error occurred while praising the tip');
-            }
-        }
     </script>
-</body>
-</html>
+{% endblock %}
