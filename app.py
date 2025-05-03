@@ -400,7 +400,47 @@ def api_create_business():
 # ===== USER ACCOUNT =====
 @app.route("/api/search", methods=["POST"])
 def api_search_businesses():
-    return jsonify({"results": []})
+    data = request.get_json()
+    search_term = data.get("searchTerm", "")
+    location = data.get("location", "")
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/search/search_queries.sql", "r") as f:
+            sql = f.read()
+
+        # Prepare search patterns
+        name_pattern = f"%{search_term}%"
+        category_pattern = f"%{search_term}%"
+        city_pattern = f"%{location}%"
+        state_pattern = f"%{location}%"
+
+        cur.execute(sql, (name_pattern, category_pattern, city_pattern, state_pattern))
+        rows = cur.fetchall()
+
+        businesses = []
+        for row in rows:
+            businesses.append({
+                "business_id": row[0],
+                "name": row[1],
+                "address": row[2],
+                "city": row[3],
+                "state": row[4],
+                "stars": row[5],
+                "review_count": row[6],
+                "is_open": row[7]
+            })
+
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, results=businesses)
+
+    except Exception as e:
+        print("Error in search_businesses:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/business/review", methods=["POST"])
 def api_post_review():

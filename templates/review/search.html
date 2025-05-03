@@ -122,7 +122,7 @@
         }
     </style>
 </head>
-<body class="customer-theme">
+<body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
@@ -251,56 +251,57 @@
                     });
 
                     const data = await response.json();
-
+                    
                     if (data.success) {
-                        if (data.businesses.length === 0) {
+                        if (data.results.length === 0) {
                             searchResults.innerHTML = `
                                 <div class="no-results">
                                     <i class="fas fa-search"></i>
-                                    <h3>No Results Found</h3>
+                                    <h3>No results found</h3>
                                     <p>Try adjusting your search terms</p>
                                 </div>
                             `;
                         } else {
-                            searchResults.innerHTML = `
-                                <div class="row">
-                                    ${data.businesses.map(business => `
-                                        <div class="col-md-6">
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">${business.name}</h5>
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <div class="star-rating me-2">
-                                                            ${Array(5).fill().map((_, i) => 
-                                                                i < business.stars ? 
-                                                                '<i class="fas fa-star"></i>' : 
-                                                                '<i class="far fa-star"></i>'
-                                                            ).join('')}
-                                                        </div>
-                                                        <span>${business.review_count} reviews</span>
-                                                    </div>
-                                                    <p class="card-text">${business.address}</p>
-                                                    <p class="card-text">
-                                                        <span class="badge ${business.is_open ? 'bg-success' : 'bg-danger'}">
-                                                            ${business.is_open ? 'Open' : 'Closed'}
-                                                        </span>
-                                                    </p>
-                                                    <a href="/review/business_view.html?businessId=${business.business_id}" class="btn btn-primary">View Details</a>
+                            searchResults.innerHTML = data.results.map(business => `
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="card-title">${business.name}</h5>
+                                                <p class="card-text text-muted">
+                                                    <i class="fas fa-map-marker-alt me-2"></i>${business.address}, ${business.city}, ${business.state}
+                                                </p>
+                                                <div class="stars mb-2">
+                                                    ${Array(5).fill().map((_, i) => 
+                                                        i < business.stars ? 
+                                                        '<i class="fas fa-star"></i>' : 
+                                                        '<i class="far fa-star"></i>'
+                                                    ).join('')}
+                                                    <span class="ms-2">(${business.review_count} reviews)</span>
                                                 </div>
                                             </div>
+                                            <div>
+                                                <span class="badge ${business.is_open ? 'bg-success' : 'bg-danger'}">
+                                                    ${business.is_open ? 'Open' : 'Closed'}
+                                                </span>
+                                            </div>
                                         </div>
-                                    `).join('')}
+                                        <a href="/review/business_view.html?businessId=${business.business_id}" class="btn btn-primary mt-3">
+                                            View Details
+                                        </a>
+                                    </div>
                                 </div>
-                            `;
+                            `).join('');
                         }
                     } else {
                         searchResults.innerHTML = `
                             <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Search failed'}
+                                <i class="fas fa-exclamation-circle me-2"></i>${data.error || 'An error occurred while searching'}
                             </div>
                         `;
                     }
                 } catch (error) {
+                    console.error('Error searching:', error);
                     searchResults.innerHTML = `
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i>An error occurred while searching
@@ -308,12 +309,12 @@
                     `;
                 }
             });
-        });
 
-        function logout() {
-            localStorage.removeItem('userData');
-            window.location.href = '/';
-        }
+            function logout() {
+                localStorage.removeItem('userData');
+                window.location.href = '/';
+            }
+        });
     </script>
 </body>
 </html>
