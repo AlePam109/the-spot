@@ -74,6 +74,18 @@ def api_login_business():
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # First check if the account exists in business_account table
+        with open("database/login/check_business_user_exists.sql", "r") as f:
+            check_sql = f.read()
+        cur.execute(check_sql, (username,))
+        exists = cur.fetchone()
+        
+        if not exists:
+            cur.close()
+            conn.close()
+            return jsonify(success=False, error="Invalid username or password")
+
+        # Then verify the password
         with open("database/login/login_business.sql", "r") as f:
             sql = f.read()
         cur.execute(sql, (username, password))
@@ -107,6 +119,18 @@ def api_login_customer():
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # First check if the account exists in user_account table
+        with open("database/login/check_user_exists.sql", "r") as f:
+            check_sql = f.read()
+        cur.execute(check_sql, (username,))
+        exists = cur.fetchone()
+        
+        if not exists:
+            cur.close()
+            conn.close()
+            return jsonify(success=False, error="Invalid username or password")
+
+        # Then verify the password
         with open("database/login/login_user.sql", "r") as f:
             sql = f.read()
         cur.execute(sql, (username, password))

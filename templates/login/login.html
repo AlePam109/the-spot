@@ -199,7 +199,11 @@
                         // Redirect to appropriate page
                         window.location.href = currentAccountType === 'business' ? '/manage' : '/search';
                     } else {
-                        errorMessage.textContent = data.error || 'Login failed. Please try again.';
+                        if (data.error === 'Invalid username or password') {
+                            errorMessage.textContent = 'Invalid username or password. Please try again.';
+                        } else {
+                            errorMessage.textContent = data.error || 'Login failed. Please try again.';
+                        }
                         errorMessage.style.display = 'block';
                     }
                 } catch (error) {
