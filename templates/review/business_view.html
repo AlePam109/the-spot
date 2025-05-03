@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Details - The Spot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #34495E;
+            --accent-color: #3498DB;
+            --light-color: #ECF0F1;
+            --success-color: #2ECC71;
+            --warning-color: #F1C40F;
+            --danger-color: #E74C3C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .business-header {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-section, .tip-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .star-rating {
+            color: var(--warning-color);
+            font-size: 1.5rem;
+        }
+
+        .review-card, .tip-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .reaction-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .reaction-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .reaction-count {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980B9;
+            border-color: #2980B9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="business-header">
+            <h1 id="businessName"></h1>
+            <div class="d-flex align-items-center mb-3">
+                <div class="star-rating me-2" id="businessStars"></div>
+                <span id="reviewCount"></span>
+            </div>
+            <p id="businessAddress"></p>
+            <p id="businessStatus"></p>
+        </div>
+
+        <div class="review-section">
+            <h2>Reviews</h2>
+            <div id="reviewsList"></div>
+            
+            <div id="reviewForm" class="mt-4">
+                <h3>Write a Review</h3>
+                <form id="submitReviewForm">
+                    <div class="mb-3">
+                        <label for="stars" class="form-label">Rating</label>
+                        <select class="form-control" id="stars" name="stars" required>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewText" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="reviewText" name="text" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tip-section">
+            <h2>Tips</h2>
+            <div id="tipsList"></div>
+            
+            <div id="tipForm" class="mt-4">
+                <h3>Add a Tip</h3>
+                <form id="submitTipForm">
+                    <div class="mb-3">
+                        <label for="tipText" class="form-label">Your Tip</label>
+                        <textarea class="form-control" id="tipText" name="text" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Tip</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const businessId = new URLSearchParams(window.location.search).get('businessId');
+            
+            // Hide forms if user is not logged in
+            if (!userData.accountType || userData.accountType !== 'customer') {
+                document.getElementById('reviewForm').style.display = 'none';
+                document.getElementById('tipForm').style.display = 'none';
+            }
+
+            // Load business details
+            async function loadBusinessDetails() {
+                try {
+                    const response = await fetch(`/api/business?accountId=${userData.id}&businessId=${businessId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const business = data.details;
+                        document.getElementById('businessName').textContent = business.name;
+                        document.getElementById('businessAddress').textContent = business.address;
+                        document.getElementById('businessStatus').textContent = business.is_open ? 'Open' : 'Closed';
+                        
+                        // Display stars
+                        const starsContainer = document.getElementById('businessStars');
+                        starsContainer.innerHTML = '';
+                        for (let i = 0; i < 5; i++) {
+                            starsContainer.innerHTML += i < business.stars ? 
+                                '<i class="fas fa-star"></i>' : 
+                                '<i class="far fa-star"></i>';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading business details:', error);
+                }
+            }
+
+            // Load reviews
+            async function loadReviews() {
+                try {
+                    const response = await fetch(`/api/business/reviews?businessId=${businessId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const reviewsList = document.getElementById('reviewsList');
+                        reviewsList.innerHTML = data.reviews.map(review => `
+                            <div class="review-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>${review.user_name}</h5>
+                                    <div class="star-rating">
+                                        ${Array(5).fill().map((_, i) => 
+                                            i < review.stars ? 
+                                            '<i class="fas fa-star"></i>' : 
+                                            '<i class="far fa-star"></i>'
+                                        ).join('')}
+                                    </div>
+                                </div>
+                                <p>${review.text}</p>
+                                <div class="d-flex gap-3">
+                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'useful')">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="reaction-count">${review.useful}</span>
+                                    </button>
+                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'funny')">
+                                        <i class="fas fa-laugh"></i>
+                                        <span class="reaction-count">${review.funny}</span>
+                                    </button>
+                                    <button class="reaction-btn" onclick="reactToReview('${review.review_id}', 'cool')">
+                                        <i class="fas fa-cool"></i>
+                                        <span class="reaction-count">${review.cool}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } catch (error) {
+                    console.error('Error loading reviews:', error);
+                }
+            }
+
+            // Load tips
+            async function loadTips() {
+                try {
+                    const response = await fetch(`/api/business/tips?businessId=${businessId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const tipsList = document.getElementById('tipsList');
+                        tipsList.innerHTML = data.tips.map(tip => `
+                            <div class="tip-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>${tip.user_name}</h5>
+                                    <button class="reaction-btn" onclick="praiseTip('${tip.tip_id}')">
+                                        <i class="fas fa-heart"></i>
+                                        <span class="reaction-count">${tip.compliment_count}</span>
+                                    </button>
+                                </div>
+                                <p>${tip.text}</p>
+                            </div>
+                        `).join('');
+                    }
+                } catch (error) {
+                    console.error('Error loading tips:', error);
+                }
+            }
+
+            // Handle review submission
+            document.getElementById('submitReviewForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const body = {
+                    user_id: userData.id,
+                    business_id: businessId,
+                    stars: parseInt(formData.get('stars')),
+                    text: formData.get('text')
+                };
+
+                try {
+                    const response = await fetch('/api/business/review', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        this.reset();
+                        loadReviews();
+                    } else {
+                        alert(data.error || 'Failed to submit review');
+                    }
+                } catch (error) {
+                    console.error('Error submitting review:', error);
+                    alert('An error occurred while submitting the review');
+                }
+            });
+
+            // Handle tip submission
+            document.getElementById('submitTipForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const body = {
+                    user_id: userData.id,
+                    business_id: businessId,
+                    text: formData.get('text')
+                };
+
+                try {
+                    const response = await fetch('/api/business/tip', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        this.reset();
+                        loadTips();
+                    } else {
+                        alert(data.error || 'Failed to submit tip');
+                    }
+                } catch (error) {
+                    console.error('Error submitting tip:', error);
+                    alert('An error occurred while submitting the tip');
+                }
+            });
+
+            // Load initial data
+            loadBusinessDetails();
+            loadReviews();
+            loadTips();
+        });
+
+        // Handle review reactions
+        async function reactToReview(reviewId, reactionType) {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (!userData.id) {
+                alert('Please login to react to reviews');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/business/review-reaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userData.id,
+                        review_id: reviewId,
+                        reaction_type: reactionType
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    loadReviews();
+                } else {
+                    alert(data.error || 'Failed to react to review');
+                }
+            } catch (error) {
+                console.error('Error reacting to review:', error);
+                alert('An error occurred while reacting to the review');
+            }
+        }
+
+        // Handle tip praises
+        async function praiseTip(tipId) {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (!userData.id) {
+                alert('Please login to praise tips');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/business/tip-praise', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userData.id,
+                        tip_id: tipId
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    loadTips();
+                } else {
+                    alert(data.error || 'Failed to praise tip');
+                }
+            } catch (error) {
+                console.error('Error praising tip:', error);
+                alert('An error occurred while praising the tip');
+            }
+        }
+    </script>
+</body>
+</html>

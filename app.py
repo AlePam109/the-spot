@@ -404,19 +404,140 @@ def api_search_businesses():
 
 @app.route("/api/business/review", methods=["POST"])
 def api_post_review():
-    return jsonify({"success": False})
+    from utils.generate_user_id import generate_user_id
+    data = request.get_json()
+    required_fields = ["user_id", "business_id", "stars", "text"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    if not (1 <= data["stars"] <= 5):
+        return jsonify(success=False, error="Stars must be between 1 and 5")
+    
+    review_id = generate_user_id()
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/review/review_queries.sql", "r") as f:
+            sql = f.read().split(';')[0]  # Get the first query (insert review)
+        
+        cur.execute(sql, (
+            review_id, data["user_id"], data["business_id"],
+            data["stars"], data["text"]
+        ))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True, review_id=review_id)
+        
+    except Exception as e:
+        print("Error in post_review:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/business/tip", methods=["POST"])
 def api_post_tip():
-    return jsonify({"success": False})
+    from utils.generate_user_id import generate_user_id
+    data = request.get_json()
+    required_fields = ["user_id", "business_id", "text"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    tip_id = generate_user_id()
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/review/review_queries.sql", "r") as f:
+            sql = f.read().split(';')[4]  # Get the insert tip query
+        
+        cur.execute(sql, (
+            tip_id, data["user_id"], data["business_id"], data["text"]
+        ))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True, tip_id=tip_id)
+        
+    except Exception as e:
+        print("Error in post_tip:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/business/tip-praise", methods=["POST"])
 def api_praise_tip():
-    return jsonify({"success": False})
+    data = request.get_json()
+    required_fields = ["user_id", "tip_id"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/review/review_queries.sql", "r") as f:
+            sql = f.read().split(';')[6]  # Get the add praise query
+        
+        cur.execute(sql, (data["user_id"], data["tip_id"]))
+        
+        # Update compliment count
+        update_sql = f.read().split(';')[7]  # Get the update compliment count query
+        cur.execute(update_sql, (data["tip_id"], data["tip_id"]))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True)
+        
+    except Exception as e:
+        print("Error in praise_tip:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/business/review-reaction", methods=["POST"])
 def api_review_reaction():
-    return jsonify({"success": False})
+    data = request.get_json()
+    required_fields = ["user_id", "review_id", "reaction_type"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify(success=False, error="Missing required fields")
+    
+    if data["reaction_type"] not in ["useful", "funny", "cool"]:
+        return jsonify(success=False, error="Invalid reaction type")
+    
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        with open("database/review/review_queries.sql", "r") as f:
+            sql = f.read().split(';')[2]  # Get the add reaction query
+        
+        cur.execute(sql, (
+            data["user_id"], data["review_id"], data["reaction_type"]
+        ))
+        
+        # Update reaction counts
+        update_sql = f.read().split(';')[3]  # Get the update reaction counts query
+        cur.execute(update_sql, (
+            data["review_id"], data["review_id"], data["review_id"], data["review_id"]
+        ))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify(success=True)
+        
+    except Exception as e:
+        print("Error in review_reaction:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/account", methods=["GET"])
 def api_get_account():

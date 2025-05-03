@@ -159,7 +159,7 @@
             </form>
         </div>
 
-        <div id="searchResults">
+        <div class="search-results" id="searchResults">
             <!-- Search results will be populated by JavaScript -->
         </div>
     </div>
@@ -265,20 +265,27 @@
                             searchResults.innerHTML = `
                                 <div class="row">
                                     ${data.businesses.map(business => `
-                                        <div class="col-md-6 col-lg-4">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="mb-0">${business.name}</h5>
-                                                </div>
+                                        <div class="col-md-6">
+                                            <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <p><i class="fas fa-map-marker-alt me-2"></i>${business.address}</p>
-                                                    <p><i class="fas fa-star me-2 stars"></i>${business.stars} Stars</p>
-                                                    <p><i class="fas fa-circle me-2 ${business.is_open ? 'open' : 'closed'}"></i>
-                                                        ${business.is_open ? 'Open' : 'Closed'}
+                                                    <h5 class="card-title">${business.name}</h5>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div class="star-rating me-2">
+                                                            ${Array(5).fill().map((_, i) => 
+                                                                i < business.stars ? 
+                                                                '<i class="fas fa-star"></i>' : 
+                                                                '<i class="far fa-star"></i>'
+                                                            ).join('')}
+                                                        </div>
+                                                        <span>${business.review_count} reviews</span>
+                                                    </div>
+                                                    <p class="card-text">${business.address}</p>
+                                                    <p class="card-text">
+                                                        <span class="badge ${business.is_open ? 'bg-success' : 'bg-danger'}">
+                                                            ${business.is_open ? 'Open' : 'Closed'}
+                                                        </span>
                                                     </p>
-                                                    <a href="/search/details?businessId=${business.business_id}" class="btn btn-primary w-100">
-                                                        <i class="fas fa-info-circle me-2"></i>View Details
-                                                    </a>
+                                                    <a href="/review/business_view.html?businessId=${business.business_id}" class="btn btn-primary">View Details</a>
                                                 </div>
                                             </div>
                                         </div>
