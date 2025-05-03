@@ -297,9 +297,7 @@
                         localStorage.setItem('userData', JSON.stringify({
                             username: data.username,
                             accountType: data.account_type,
-                            id: currentAccountType === 'business' ? data.account_id : data.user_id,
-                            name: data.profile.name,
-                            yelping_since: data.profile.yelping_since
+                            id: currentAccountType === 'business' ? data.account_id : data.user_id
                         }));
 
                         // Redirect to appropriate page
@@ -327,10 +325,6 @@
                         document.getElementById('username').value = data.profile.username;
                         document.getElementById('name').value = data.profile.name;
                         document.getElementById('email').value = data.profile.email;
-                        localStorage.setItem('userData', JSON.stringify({
-                            ...userData,
-                            name: document.getElementById('name').value
-                        }));
                     }
                 } catch (error) {
                     console.error('Error loading profile:', error);

@@ -204,16 +204,9 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        document.getElementById('username').value = data.profile.username;
-                        document.getElementById('name').value = data.profile.name;
-                        document.getElementById('yelpingSince').value = new Date(data.profile.yelping_since).toLocaleDateString();
-                        
-                        // Update localStorage with fresh data
-                        localStorage.setItem('userData', JSON.stringify({
-                            ...userData,
-                            name: data.profile.name,
-                            yelping_since: data.profile.yelping_since
-                        }));
+                        document.getElementById('username').value = data.username;
+                        document.getElementById('name').value = data.name;
+                        document.getElementById('yelpingSince').value = new Date(data.yelping_since).toLocaleDateString();
                     } else {
                         showError('Failed to load profile information');
                     }
@@ -255,11 +248,15 @@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h5>${review.business_name}</h5>
                                     <div class="star-rating">
-                                        ${'★'.repeat(review.stars)}${'☆'.repeat(5 - review.stars)}
+                                        ${Array(5).fill().map((_, i) => 
+                                            i < review.stars ? 
+                                            '<i class="fas fa-star"></i>' : 
+                                            '<i class="far fa-star"></i>'
+                                        ).join('')}
                                     </div>
                                 </div>
                                 <p>${review.text}</p>
-                                <small class="text-muted">Posted on ${new Date(review.date).toLocaleDateString()}</small>
+                                <small class="text-muted">${new Date(review.date).toLocaleDateString()}</small>
                             </div>
                         `).join('');
 
@@ -269,57 +266,56 @@
                             <div class="activity-card">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h5>${tip.business_name}</h5>
+                                    <span class="text-muted">
+                                        <i class="fas fa-heart"></i> ${tip.compliment_count}
+                                    </span>
                                 </div>
                                 <p>${tip.text}</p>
-                                <small class="text-muted">Posted on ${new Date(tip.date).toLocaleDateString()}</small>
+                                <small class="text-muted">${new Date(tip.date).toLocaleDateString()}</small>
                             </div>
                         `).join('');
-                    } else {
-                        showError('Failed to load activity information');
                     }
                 } catch (error) {
                     console.error('Error loading activity:', error);
-                    showError('Error loading activity information');
                 }
             }
 
             // Handle profile update
             document.getElementById('profileForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                const body = {
+                    user_id: userData.id,
+                    name: document.getElementById('name').value
+                };
+
                 try {
                     const response = await fetch('/api/account/update', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            userId: userData.id,
-                            name: document.getElementById('name').value
-                        })
+                        body: JSON.stringify(body)
                     });
+
                     const data = await response.json();
-                    
                     if (data.success) {
                         showSuccess('Profile updated successfully');
-                        // Update localStorage with new name
-                        localStorage.setItem('userData', JSON.stringify({
-                            ...userData,
-                            name: document.getElementById('name').value
-                        }));
-                        // Update welcome message
-                        welcomeMessage.innerHTML = `Welcome, ${document.getElementById('name').value}!`;
+                        // Update welcome message with new name
+                        welcomeMessage.innerHTML = `Welcome, ${body.name}!`;
                     } else {
                         showError(data.error || 'Failed to update profile');
                     }
                 } catch (error) {
                     console.error('Error updating profile:', error);
-                    showError('Error updating profile');
+                    showError('An error occurred while updating your profile');
                 }
             });
 
             // Handle password change
             document.getElementById('passwordForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
                 const newPassword = document.getElementById('newPassword').value;
                 const confirmPassword = document.getElementById('confirmPassword').value;
                 
@@ -328,64 +324,71 @@
                     return;
                 }
 
+                const body = {
+                    user_id: userData.id,
+                    current_password: document.getElementById('currentPassword').value,
+                    new_password: newPassword
+                };
+
                 try {
                     const response = await fetch('/api/account/password', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            userId: userData.id,
-                            currentPassword: document.getElementById('currentPassword').value,
-                            newPassword: newPassword
-                        })
+                        body: JSON.stringify(body)
                     });
+
                     const data = await response.json();
-                    
                     if (data.success) {
                         showSuccess('Password changed successfully');
-                        document.getElementById('passwordForm').reset();
+                        this.reset();
                     } else {
                         showError(data.error || 'Failed to change password');
                     }
                 } catch (error) {
                     console.error('Error changing password:', error);
-                    showError('Error changing password');
+                    showError('An error occurred while changing your password');
                 }
             });
-
-            // Handle account deletion
-            window.confirmDeleteAccount = function() {
-                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                    fetch('/api/account/delete', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId: userData.id
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            localStorage.removeItem('userData');
-                            window.location.href = '/';
-                        } else {
-                            showError(data.error || 'Failed to delete account');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error deleting account:', error);
-                        showError('Error deleting account');
-                    });
-                }
-            };
 
             // Load initial data
             loadProfile();
             loadActivity();
         });
+
+        function confirmDeleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                deleteAccount();
+            }
+        }
+
+        async function deleteAccount() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            try {
+                const response = await fetch('/api/account/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userData.id
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.removeItem('userData');
+                    window.location.href = '/';
+                } else {
+                    showError(data.error || 'Failed to delete account');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                showError('An error occurred while deleting your account');
+            }
+        }
     </script>
 </body>
 </html>
