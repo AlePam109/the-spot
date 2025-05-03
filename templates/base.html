@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
+            /* Business theme: dark blue - silver */
+            --business-primary: #1A237E;
+            --business-secondary: #283593;
+            --business-accent: #5C6BC0;
+            --business-light: #E8EAF6;
+            --business-dark: #0D1B2A;
+            --business-silver: #B0BEC5;
+
+            /* Customer theme: AMEX gold */
+            --customer-primary: #D4AF37;
+            --customer-secondary: #FFD700;
+            --customer-accent: #FFC107;
+            --customer-light: #FFF8E1;
+            --customer-dark: #B8860B;
+
+            /* Default theme */
             --primary-color: #2C3E50;
             --secondary-color: #34495E;
             --accent-color: #3498DB;
@@ -82,20 +98,78 @@
 
         /* Business-specific styles */
         .business-nav {
-            background-color: var(--secondary-color);
+            background-color: var(--business-primary);
         }
 
         .business-nav .nav-link {
-            color: rgba(255,255,255,0.9) !important;
+            color: var(--business-silver) !important;
+        }
+
+        .business-nav .nav-link:hover {
+            color: white !important;
+        }
+
+        .business-theme {
+            background-color: var(--business-light);
+        }
+
+        .business-theme .card {
+            background-color: white;
+            border: 1px solid var(--business-silver);
+        }
+
+        .business-theme .card-header {
+            background-color: var(--business-secondary);
+            color: white;
+        }
+
+        .business-theme .btn-primary {
+            background-color: var(--business-accent);
+            border-color: var(--business-accent);
+        }
+
+        .business-theme .btn-primary:hover {
+            background-color: var(--business-secondary);
+            border-color: var(--business-secondary);
         }
 
         /* Customer-specific styles */
         .customer-nav {
-            background-color: var(--accent-color);
+            background-color: var(--customer-primary);
         }
 
         .customer-nav .nav-link {
-            color: rgba(255,255,255,0.9) !important;
+            color: var(--customer-light) !important;
+        }
+
+        .customer-nav .nav-link:hover {
+            color: white !important;
+        }
+
+        .customer-theme {
+            background-color: var(--customer-light);
+        }
+
+        .customer-theme .card {
+            background-color: white;
+            border: 1px solid var(--customer-accent);
+        }
+
+        .customer-theme .card-header {
+            background-color: var(--customer-primary);
+            color: white;
+        }
+
+        .customer-theme .btn-primary {
+            background-color: var(--customer-accent);
+            border-color: var(--customer-accent);
+            color: var(--customer-dark);
+        }
+
+        .customer-theme .btn-primary:hover {
+            background-color: var(--customer-secondary);
+            border-color: var(--customer-secondary);
+            color: var(--customer-dark);
         }
     </style>
 </head>
@@ -105,7 +179,7 @@
             <a class="navbar-brand" href="/">
                 <i class="fas fa-store me-2"></i>The Spot
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -116,7 +190,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4" id="mainContent">
         {% block content %}{% endblock %}
     </div>
 
@@ -142,13 +216,16 @@
         function updateUI(accountType, username) {
             const nav = document.getElementById('navLinks');
             const mainNav = document.getElementById('mainNav');
+            const mainContent = document.getElementById('mainContent');
             
-            // Reset navigation
+            // Reset navigation and theme
             nav.innerHTML = '';
             mainNav.classList.remove('business-nav', 'customer-nav');
+            mainContent.classList.remove('business-theme', 'customer-theme');
 
             if (accountType === 'business') {
                 mainNav.classList.add('business-nav');
+                mainContent.classList.add('business-theme');
                 nav.innerHTML = `
                     <li class="nav-item">
                         <a class="nav-link" href="/manage">
@@ -173,6 +250,7 @@
                 `;
             } else if (accountType === 'customer') {
                 mainNav.classList.add('customer-nav');
+                mainContent.classList.add('customer-theme');
                 nav.innerHTML = `
                     <li class="nav-item">
                         <a class="nav-link" href="/search">

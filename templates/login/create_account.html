@@ -204,15 +204,15 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        // Store user data in localStorage
-                        localStorage.setItem('userData', JSON.stringify({
-                            username: username,
-                            accountType: currentAccountType,
-                            id: currentAccountType === 'business' ? data.account_id : data.user_id
-                        }));
-
-                        // Redirect to appropriate page
-                        window.location.href = currentAccountType === 'business' ? '/manage' : '/search';
+                        // Show success message and redirect to login page
+                        errorMessage.style.display = 'block';
+                        errorMessage.style.color = 'var(--success-color)';
+                        errorMessage.textContent = 'Account created successfully! Redirecting to login...';
+                        
+                        // Redirect to login page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
                     } else {
                         errorMessage.textContent = data.error || 'Account creation failed. Please try again.';
                         errorMessage.style.display = 'block';

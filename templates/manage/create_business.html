@@ -1,33 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Create Business</title>
-    <script type="module" src="/static/business.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Business - The Spot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --business-primary: #1A237E;
+            --business-secondary: #283593;
+            --business-accent: #5C6BC0;
+            --business-light: #E8EAF6;
+            --business-dark: #0D1B2A;
+            --business-silver: #B0BEC5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--business-light);
+            color: var(--business-dark);
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid var(--business-silver);
+            padding: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--business-accent);
+            box-shadow: 0 0 0 0.2rem rgba(92, 107, 192, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--business-accent);
+            border-color: var(--business-accent);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--business-secondary);
+            border-color: var(--business-secondary);
+        }
+
+        .error-message {
+            color: #E74C3C;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h2>Create a New Business</h2>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="mb-4"><i class="fas fa-plus-circle me-2"></i>Create a New Business</h2>
 
-    <form id="createBusinessForm">
-        <label>Name: <input type="text" name="name" required /></label><br />
-        <label>Address: <input type="text" name="address" required /></label><br />
-        <label>City: <input type="text" name="city" required /></label><br />
-        <label>State: <input type="text" name="state" required /></label><br />
-        <label>Postal Code: <input type="text" name="postal_code" required /></label><br />
-        <label>Latitude: <input type="number" step="any" name="latitude" required /></label><br />
-        <label>Longitude: <input type="number" step="any" name="longitude" required /></label><br />
-        <label>
-            Is Open:
-            <select name="is_open">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </label><br />
-        <label>Attributes (JSON): <textarea name="attributes" required>{}</textarea></label><br />
-        <label>Categories (comma-separated): <input type="text" name="categories" required /></label><br />
-        <label>Hours (JSON): <textarea name="hours" required>{}</textarea></label><br /><br />
+            <form id="createBusinessForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Business Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter business name" required>
+                </div>
 
-        <button type="submit">Create Business</button>
-    </form>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter business address" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="state" placeholder="Enter state" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="postal_code" class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Enter postal code" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" step="any" class="form-control" id="latitude" name="latitude" placeholder="Enter latitude" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" step="any" class="form-control" id="longitude" name="longitude" placeholder="Enter longitude" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="is_open" class="form-label">Business Status</label>
+                    <select class="form-control" id="is_open" name="is_open" required>
+                        <option value="true">Open</option>
+                        <option value="false">Closed</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="categories" class="form-label">Business Categories (comma-separated)</label>
+                    <input type="text" class="form-control" id="categories" name="categories" placeholder="Enter categories separated by commas" required>
+                    <small class="text-muted">Example: Restaurant, Italian, Pizza</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="hours" class="form-label">Business Hours (JSON)</label>
+                    <textarea class="form-control" id="hours" name="hours" rows="3" placeholder="Enter business hours in JSON format" required>{"Monday": "9:00-17:00", "Tuesday": "9:00-17:00", "Wednesday": "9:00-17:00", "Thursday": "9:00-17:00", "Friday": "9:00-17:00", "Saturday": "10:00-15:00", "Sunday": "Closed"}</textarea>
+                    <small class="text-muted">Enter business hours in JSON format</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="attributes" class="form-label">Business Attributes (JSON)</label>
+                    <textarea class="form-control" id="attributes" name="attributes" rows="3" placeholder="Enter business attributes in JSON format" required>{"WiFi": "free", "Parking": "street", "Ambience": "casual"}</textarea>
+                    <small class="text-muted">Enter business attributes in JSON format</small>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-2"></i>Create Business
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const form = document.getElementById('createBusinessForm');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Check if user is logged in and is a business account
+            if (!userData.accountType || userData.accountType !== 'business') {
+                window.location.href = '/';
+                return;
+            }
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                const body = {
+                    account_id: userData.id,
+                    name: formData.get('name'),
+                    address: formData.get('address'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    postal_code: formData.get('postal_code'),
+                    latitude: parseFloat(formData.get('latitude')),
+                    longitude: parseFloat(formData.get('longitude')),
+                    is_open: formData.get('is_open') === 'true',
+                    attributes: JSON.parse(formData.get('attributes')),
+                    categories: formData.get('categories').split(',').map(x => x.trim()),
+                    hours: JSON.parse(formData.get('hours'))
+                };
+
+                try {
+                    const response = await fetch('/api/business/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        window.location.href = '/manage';
+                    } else {
+                        errorMessage.textContent = data.error || 'Failed to create business';
+                        errorMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    errorMessage.textContent = 'An error occurred while creating the business';
+                    errorMessage.style.display = 'block';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
