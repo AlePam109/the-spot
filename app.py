@@ -82,7 +82,7 @@ def api_login_business():
         conn.close()
 
         if result:
-            return jsonify(success=True, account_id=result[0])
+            return jsonify(success=True, account_id=result[0], username=username, account_type="business")
         else:
             return jsonify(success=False, error="Invalid username or password")
 
@@ -115,7 +115,7 @@ def api_login_customer():
         conn.close()
 
         if result:
-            return jsonify(success=True, user_id=result[0])
+            return jsonify(success=True, user_id=result[0], username=username, account_type="customer")
         else:
             return jsonify(success=False, error="Invalid username or password")
 

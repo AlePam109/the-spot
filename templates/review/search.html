@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - The Spot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #34495E;
+            --accent-color: #3498DB;
+            --light-color: #ECF0F1;
+            --success-color: #2ECC71;
+            --warning-color: #F1C40F;
+            --danger-color: #E74C3C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .container {
+            margin-top: 2rem;
+        }
+
+        .search-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980B9;
+            border-color: #2980B9;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem;
+        }
+
+        .stars {
+            color: var(--warning-color);
+        }
+
+        .open {
+            color: var(--success-color);
+        }
+
+        .closed {
+            color: var(--danger-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-store me-2"></i>The Spot
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto" id="navLinks">
+                    <!-- Navigation links will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="search-container">
+            <h2 class="mb-4">Search Businesses</h2>
+            <form id="searchForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <input type="text" class="form-control" id="searchTerm" placeholder="Search by name or category">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <input type="text" class="form-control" id="location" placeholder="Location (city, state)">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="searchResults">
+            <!-- Search results will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const nav = document.getElementById('navLinks');
+            const searchForm = document.getElementById('searchForm');
+            const searchResults = document.getElementById('searchResults');
+
+            // Update navigation based on account type
+            if (userData.accountType === 'business') {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manage">
+                            <i class="fas fa-briefcase me-1"></i>Manage Businesses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">
+                            <i class="fas fa-user me-1"></i>${userData.username}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                `;
+            } else if (userData.accountType === 'customer') {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">
+                            <i class="fas fa-user me-1"></i>${userData.username}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/create-account">
+                            <i class="fas fa-user-plus me-1"></i>Create Account
+                        </a>
+                    </li>
+                `;
+            }
+
+            // Handle search form submission
+            searchForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const searchTerm = document.getElementById('searchTerm').value;
+                const location = document.getElementById('location').value;
+
+                try {
+                    const response = await fetch('/api/search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ searchTerm, location })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (data.businesses.length === 0) {
+                            searchResults.innerHTML = `
+                                <div class="no-results">
+                                    <i class="fas fa-search"></i>
+                                    <h3>No Results Found</h3>
+                                    <p>Try adjusting your search terms</p>
+                                </div>
+                            `;
+                        } else {
+                            searchResults.innerHTML = `
+                                <div class="row">
+                                    ${data.businesses.map(business => `
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5 class="mb-0">${business.name}</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p><i class="fas fa-map-marker-alt me-2"></i>${business.address}</p>
+                                                    <p><i class="fas fa-star me-2 stars"></i>${business.stars} Stars</p>
+                                                    <p><i class="fas fa-circle me-2 ${business.is_open ? 'open' : 'closed'}"></i>
+                                                        ${business.is_open ? 'Open' : 'Closed'}
+                                                    </p>
+                                                    <a href="/search/details?businessId=${business.business_id}" class="btn btn-primary w-100">
+                                                        <i class="fas fa-info-circle me-2"></i>View Details
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+                    } else {
+                        searchResults.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Search failed'}
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    searchResults.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>An error occurred while searching
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
