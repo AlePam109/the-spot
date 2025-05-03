@@ -315,6 +315,21 @@
                     errorMessage.style.display = 'block';
                 }
             });
+
+            async function loadProfile() {
+                try {
+                    const response = await fetch(`/api/account?userId=${userData.id}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('username').value = data.profile.username;
+                        document.getElementById('name').value = data.profile.name;
+                        document.getElementById('email').value = data.profile.email;
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                }
+            }
         });
     </script>
 </body>

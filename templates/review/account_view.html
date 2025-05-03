@@ -185,6 +185,12 @@
                 return;
             }
 
+            // Display welcome message
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'alert alert-info mb-4';
+            welcomeMessage.innerHTML = `Welcome, ${userData.username || 'User'}!`;
+            document.querySelector('.account-container').insertBefore(welcomeMessage, document.querySelector('h2'));
+
             // Load user profile
             async function loadProfile() {
                 try {
@@ -195,10 +201,31 @@
                         document.getElementById('username').value = data.profile.username;
                         document.getElementById('name').value = data.profile.name;
                         document.getElementById('email').value = data.profile.email;
+                    } else {
+                        showError('Failed to load profile information');
                     }
                 } catch (error) {
                     console.error('Error loading profile:', error);
+                    showError('Error loading profile information');
                 }
+            }
+
+            // Show error message
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.textContent = message;
+                document.querySelector('.account-container').appendChild(errorDiv);
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+
+            // Show success message
+            function showSuccess(message) {
+                const successDiv = document.createElement('div');
+                successDiv.className = 'alert alert-success';
+                successDiv.textContent = message;
+                document.querySelector('.account-container').appendChild(successDiv);
+                setTimeout(() => successDiv.remove(), 5000);
             }
 
             // Load user activity
@@ -268,13 +295,15 @@
 
                     const data = await response.json();
                     if (data.success) {
-                        alert('Profile updated successfully');
+                        showSuccess('Profile updated successfully');
+                        // Update welcome message with new name
+                        welcomeMessage.innerHTML = `Welcome, ${body.name}!`;
                     } else {
-                        alert(data.error || 'Failed to update profile');
+                        showError(data.error || 'Failed to update profile');
                     }
                 } catch (error) {
                     console.error('Error updating profile:', error);
-                    alert('An error occurred while updating your profile');
+                    showError('An error occurred while updating your profile');
                 }
             });
 
@@ -286,7 +315,7 @@
                 const confirmPassword = document.getElementById('confirmPassword').value;
                 
                 if (newPassword !== confirmPassword) {
-                    alert('New passwords do not match');
+                    showError('New passwords do not match');
                     return;
                 }
 
@@ -307,14 +336,14 @@
 
                     const data = await response.json();
                     if (data.success) {
-                        alert('Password changed successfully');
+                        showSuccess('Password changed successfully');
                         this.reset();
                     } else {
-                        alert(data.error || 'Failed to change password');
+                        showError(data.error || 'Failed to change password');
                     }
                 } catch (error) {
                     console.error('Error changing password:', error);
-                    alert('An error occurred while changing your password');
+                    showError('An error occurred while changing your password');
                 }
             });
 
@@ -348,11 +377,11 @@
                     localStorage.removeItem('userData');
                     window.location.href = '/';
                 } else {
-                    alert(data.error || 'Failed to delete account');
+                    showError(data.error || 'Failed to delete account');
                 }
             } catch (error) {
                 console.error('Error deleting account:', error);
-                alert('An error occurred while deleting your account');
+                showError('An error occurred while deleting your account');
             }
         }
     </script>
