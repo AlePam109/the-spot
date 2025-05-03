@@ -3,7 +3,10 @@ SELECT b.business_id, b.name, b.address, b.city, b.state, b.stars, b.review_coun
 FROM business b
 WHERE (
     LOWER(b.name) LIKE LOWER(%s) OR
-    LOWER(b.categories) LIKE LOWER(%s)
+    EXISTS (
+        SELECT 1 FROM unnest(b.categories) AS cat
+        WHERE LOWER(cat) LIKE LOWER(%s)
+    )
 ) AND (
     LOWER(b.city) LIKE LOWER(%s) OR
     LOWER(b.state) LIKE LOWER(%s)

@@ -164,26 +164,60 @@
             // Load business details
             async function loadBusinessDetails() {
                 try {
-                    const response = await fetch(`/api/business?accountId=${userData.id}&businessId=${businessId}`);
+                    const response = await fetch(`/api/business?businessId=${businessId}`);
                     const data = await response.json();
                     
                     if (data.success) {
                         const business = data.details;
                         document.getElementById('businessName').textContent = business.name;
-                        document.getElementById('businessAddress').textContent = business.address;
+                        document.getElementById('businessAddress').textContent = `${business.address}, ${business.city}, ${business.state} ${business.postal_code}`;
                         document.getElementById('businessStatus').textContent = business.is_open ? 'Open' : 'Closed';
+                        document.getElementById('businessStatus').className = business.is_open ? 'badge bg-success' : 'badge bg-danger';
+                        
+                        // Display categories
+                        const categoriesContainer = document.getElementById('businessCategories');
+                        categoriesContainer.innerHTML = business.categories.map(cat => 
+                            `<span class="badge bg-secondary me-2">${cat}</span>`
+                        ).join('');
                         
                         // Display stars
                         const starsContainer = document.getElementById('businessStars');
                         starsContainer.innerHTML = '';
                         for (let i = 0; i < 5; i++) {
                             starsContainer.innerHTML += i < business.stars ? 
-                                '<i class="fas fa-star"></i>' : 
-                                '<i class="far fa-star"></i>';
+                                '<i class="fas fa-star text-warning"></i>' : 
+                                '<i class="far fa-star text-warning"></i>';
                         }
+                        starsContainer.innerHTML += ` <span class="ms-2">(${business.review_count} reviews)</span>`;
+                        
+                        // Display hours if available
+                        const hoursContainer = document.getElementById('businessHours');
+                        if (business.hours) {
+                            const hoursList = document.createElement('ul');
+                            hoursList.className = 'list-unstyled';
+                            for (const [day, hours] of Object.entries(business.hours)) {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${day}:</strong> ${hours}`;
+                                hoursList.appendChild(li);
+                            }
+                            hoursContainer.appendChild(hoursList);
+                        } else {
+                            hoursContainer.innerHTML = '<p>Hours not available</p>';
+                        }
+                    } else {
+                        document.getElementById('businessDetails').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Business not found'}
+                            </div>
+                        `;
                     }
                 } catch (error) {
                     console.error('Error loading business details:', error);
+                    document.getElementById('businessDetails').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>An error occurred while loading business details
+                        </div>
+                    `;
                 }
             }
 

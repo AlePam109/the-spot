@@ -280,11 +280,10 @@ def api_get_my_businesses():
 
 @app.route("/api/business", methods=["GET"])
 def api_get_business():
-    account_id = request.args.get("accountId")
     business_id = request.args.get("businessId")
 
-    if not account_id or not business_id:
-        return jsonify(success=False, error="Missing parameters")
+    if not business_id:
+        return jsonify(success=False, error="Missing business ID")
 
     try:
         conn = get_db_connection()
@@ -293,7 +292,7 @@ def api_get_business():
         with open("database/business/get_business_by_id.sql", "r") as f:
             sql = f.read()
 
-        cur.execute(sql, (business_id, account_id))
+        cur.execute(sql, (business_id,))
         row = cur.fetchone()
 
         if not row:
