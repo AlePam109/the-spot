@@ -1,11 +1,11 @@
 -- Get user profile
-SELECT user_id, username, name, email
+SELECT user_id, username, name, yelping_since
 FROM yelp_user
 WHERE user_id = %s;
 
 -- Update user profile
 UPDATE yelp_user
-SET name = %s, email = %s
+SET name = %s
 WHERE user_id = %s
 RETURNING user_id;
 

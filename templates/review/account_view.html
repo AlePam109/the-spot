@@ -128,8 +128,8 @@
                             <input type="text" class="form-control" id="name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
+                            <label for="yelpingSince" class="form-label">Yelping Since</label>
+                            <input type="text" class="form-control" id="yelpingSince" readonly>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
@@ -200,7 +200,7 @@
                     if (data.success) {
                         document.getElementById('username').value = data.profile.username;
                         document.getElementById('name').value = data.profile.name;
-                        document.getElementById('email').value = data.profile.email;
+                        document.getElementById('yelpingSince').value = new Date(data.profile.yelping_since).toLocaleDateString();
                     } else {
                         showError('Failed to load profile information');
                     }
@@ -280,8 +280,7 @@
                 
                 const body = {
                     user_id: userData.id,
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value
+                    name: document.getElementById('name').value
                 };
 
                 try {
