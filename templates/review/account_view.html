@@ -186,6 +186,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             
+            // Check if user is logged in
             if (!userData.id) {
                 window.location.href = '/';
                 return;
@@ -355,6 +356,17 @@
             // Load initial data
             loadProfile();
             loadActivity();
+
+            // Handle home button click
+            document.querySelector('.btn-outline-primary').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Ensure user data is still in localStorage before redirecting
+                if (localStorage.getItem('userData')) {
+                    window.location.href = '/search';
+                } else {
+                    window.location.href = '/';
+                }
+            });
         });
 
         function confirmDeleteAccount() {
