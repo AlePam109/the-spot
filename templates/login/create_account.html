@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
+            /* Business theme: dark blue - silver */
+            --business-primary: #1A237E;
+            --business-secondary: #283593;
+            --business-accent: #5C6BC0;
+            --business-light: #E8EAF6;
+            --business-dark: #0D1B2A;
+            --business-silver: #B0BEC5;
+
+            /* Customer theme: AMEX gold */
+            --customer-primary: #D4AF37;
+            --customer-secondary: #FFD700;
+            --customer-accent: #FFC107;
+            --customer-light: #FFF8E1;
+            --customer-dark: #B8860B;
+
+            /* Default theme */
             --primary-color: #2C3E50;
             --secondary-color: #34495E;
             --accent-color: #3498DB;
@@ -25,6 +41,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background-color 0.3s ease;
         }
 
         .create-account-container {
@@ -34,6 +51,7 @@
             padding: 2rem;
             width: 100%;
             max-width: 400px;
+            transition: all 0.3s ease;
         }
 
         .create-account-header {
@@ -42,8 +60,8 @@
         }
 
         .create-account-header h1 {
-            color: var(--primary-color);
             font-weight: bold;
+            transition: color 0.3s ease;
         }
 
         .form-control {
@@ -51,25 +69,19 @@
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: var(--accent-color);
             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
 
         .btn-primary {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
             border-radius: 8px;
             padding: 10px;
             width: 100%;
             margin-top: 1rem;
-        }
-
-        .btn-primary:hover {
-            background-color: #2980B9;
-            border-color: #2980B9;
+            transition: all 0.3s ease;
         }
 
         .account-type-toggle {
@@ -80,11 +92,10 @@
 
         .account-type-btn {
             padding: 0.5rem 1rem;
-            border: 1px solid var(--accent-color);
+            border: 1px solid;
             background-color: white;
-            color: var(--accent-color);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .account-type-btn:first-child {
@@ -96,7 +107,6 @@
         }
 
         .account-type-btn.active {
-            background-color: var(--accent-color);
             color: white;
         }
 
@@ -106,8 +116,8 @@
         }
 
         .login-link a {
-            color: var(--accent-color);
             text-decoration: none;
+            transition: color 0.3s ease;
         }
 
         .login-link a:hover {
@@ -120,9 +130,86 @@
             margin-top: 1rem;
             display: none;
         }
+
+        /* Business theme styles */
+        .business-theme {
+            background-color: var(--business-light);
+            color: var(--business-dark);
+        }
+
+        .business-theme .create-account-header h1 {
+            color: var(--business-primary);
+        }
+
+        .business-theme .form-control:focus {
+            border-color: var(--business-accent);
+            box-shadow: 0 0 0 0.2rem rgba(92, 107, 192, 0.25);
+        }
+
+        .business-theme .btn-primary {
+            background-color: var(--business-accent);
+            border-color: var(--business-accent);
+        }
+
+        .business-theme .btn-primary:hover {
+            background-color: var(--business-secondary);
+            border-color: var(--business-secondary);
+        }
+
+        .business-theme .account-type-btn {
+            border-color: var(--business-accent);
+            color: var(--business-accent);
+        }
+
+        .business-theme .account-type-btn.active {
+            background-color: var(--business-accent);
+        }
+
+        .business-theme .login-link a {
+            color: var(--business-accent);
+        }
+
+        /* Customer theme styles */
+        .customer-theme {
+            background-color: var(--customer-light);
+            color: var(--customer-dark);
+        }
+
+        .customer-theme .create-account-header h1 {
+            color: var(--customer-primary);
+        }
+
+        .customer-theme .form-control:focus {
+            border-color: var(--customer-accent);
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+        .customer-theme .btn-primary {
+            background-color: var(--customer-accent);
+            border-color: var(--customer-accent);
+            color: var(--customer-dark);
+        }
+
+        .customer-theme .btn-primary:hover {
+            background-color: var(--customer-secondary);
+            border-color: var(--customer-secondary);
+        }
+
+        .customer-theme .account-type-btn {
+            border-color: var(--customer-accent);
+            color: var(--customer-accent);
+        }
+
+        .customer-theme .account-type-btn.active {
+            background-color: var(--customer-accent);
+        }
+
+        .customer-theme .login-link a {
+            color: var(--customer-accent);
+        }
     </style>
 </head>
-<body>
+<body class="customer-theme">
     <div class="create-account-container">
         <div class="create-account-header">
             <h1><i class="fas fa-store me-2"></i>The Spot</h1>
@@ -165,6 +252,7 @@
             const form = document.getElementById('createAccountForm');
             const errorMessage = document.getElementById('errorMessage');
             const accountTypeBtns = document.querySelectorAll('.account-type-btn');
+            const body = document.body;
             let currentAccountType = 'customer';
 
             // Handle account type toggle
@@ -173,6 +261,15 @@
                     accountTypeBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     currentAccountType = this.dataset.type;
+                    
+                    // Update theme based on account type
+                    if (currentAccountType === 'business') {
+                        body.classList.remove('customer-theme');
+                        body.classList.add('business-theme');
+                    } else {
+                        body.classList.remove('business-theme');
+                        body.classList.add('customer-theme');
+                    }
                 });
             });
 
