@@ -23,6 +23,24 @@
             color: var(--primary-color);
         }
 
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
         .business-header {
             background-color: white;
             border-radius: 10px;
@@ -95,6 +113,22 @@
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/search">
+                <i class="fas fa-store me-2"></i>The Spot
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto" id="navLinks">
+                    <!-- Navigation links will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <div class="business-header">
             <h1 id="businessName"></h1>
@@ -154,7 +188,70 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             const businessId = new URLSearchParams(window.location.search).get('businessId');
+            const nav = document.getElementById('navLinks');
             
+            // Update navigation based on account type
+            if (userData.accountType === 'business') {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manage">
+                            <i class="fas fa-briefcase me-1"></i>Manage Businesses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">
+                            <i class="fas fa-user me-1"></i>${userData.username}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                `;
+            } else if (userData.accountType === 'customer') {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">
+                            <i class="fas fa-user me-1"></i>${userData.username}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/create-account">
+                            <i class="fas fa-user-plus me-1"></i>Create Account
+                        </a>
+                    </li>
+                `;
+            }
+
             // Hide forms if user is not logged in
             if (!userData.accountType || userData.accountType !== 'customer') {
                 document.getElementById('reviewForm').style.display = 'none';
@@ -361,6 +458,12 @@
             loadBusinessDetails();
             loadReviews();
             loadTips();
+
+            // Add logout function
+            window.logout = function() {
+                localStorage.removeItem('userData');
+                window.location.href = '/';
+            };
         });
 
         // Handle review reactions
