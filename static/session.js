@@ -12,7 +12,7 @@ export function isLoggedIn() {
 
 export function clearSession() {
     localStorage.removeItem('userData');
-    window.location.href = '/';
+    window.location.href = '/';  // This will redirect to the login page since '/' is the login route
 }
 
 export function setSession(userData) {
