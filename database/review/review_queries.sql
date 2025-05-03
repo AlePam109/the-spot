@@ -7,7 +7,7 @@ RETURNING review_id;
 SELECT r.review_id, r.stars, r.text, r.useful, r.funny, r.cool, r.date,
        u.username, u.name as user_name
 FROM review r
-JOIN user_account u ON r.user_id = u.user_id
+JOIN yelp_user u ON r.user_id = u.user_id
 WHERE r.business_id = %s
 ORDER BY r.date DESC;
 
@@ -32,7 +32,7 @@ RETURNING tip_id;
 SELECT t.tip_id, t.text, t.compliment_count, t.date,
        u.username, u.name as user_name
 FROM tip t
-JOIN user_account u ON t.user_id = u.user_id
+JOIN yelp_user u ON t.user_id = u.user_id
 WHERE t.business_id = %s
 ORDER BY t.date DESC;
 
