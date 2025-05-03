@@ -1,22 +1,22 @@
 -- Get user profile
 SELECT user_id, username, name, email
-FROM user_account
+FROM yelp_user
 WHERE user_id = %s;
 
 -- Update user profile
-UPDATE user_account
+UPDATE yelp_user
 SET name = %s, email = %s
 WHERE user_id = %s
 RETURNING user_id;
 
 -- Change password
-UPDATE user_account
+UPDATE yelp_user
 SET password = %s
 WHERE user_id = %s AND password = %s
 RETURNING user_id;
 
 -- Delete account
-DELETE FROM user_account
+DELETE FROM yelp_user
 WHERE user_id = %s
 RETURNING user_id;
 

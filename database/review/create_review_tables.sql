@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS review (
     funny INTEGER DEFAULT 0,
     cool INTEGER DEFAULT 0,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user_account(user_id),
+    FOREIGN KEY (user_id) REFERENCES yelp_user(user_id),
     FOREIGN KEY (business_id) REFERENCES business(business_id)
 );
 
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS tip (
     text TEXT NOT NULL,
     compliment_count INTEGER DEFAULT 0,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user_account(user_id),
+    FOREIGN KEY (user_id) REFERENCES yelp_user(user_id),
     FOREIGN KEY (business_id) REFERENCES business(business_id)
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS review_reaction (
     review_id VARCHAR(22) NOT NULL,
     reaction_type VARCHAR(10) NOT NULL CHECK (reaction_type IN ('useful', 'funny', 'cool')),
     PRIMARY KEY (user_id, review_id, reaction_type),
-    FOREIGN KEY (user_id) REFERENCES user_account(user_id),
+    FOREIGN KEY (user_id) REFERENCES yelp_user(user_id),
     FOREIGN KEY (review_id) REFERENCES review(review_id)
 );
 
@@ -40,6 +40,6 @@ CREATE TABLE IF NOT EXISTS tip_praise (
     user_id VARCHAR(22) NOT NULL,
     tip_id VARCHAR(22) NOT NULL,
     PRIMARY KEY (user_id, tip_id),
-    FOREIGN KEY (user_id) REFERENCES user_account(user_id),
+    FOREIGN KEY (user_id) REFERENCES yelp_user(user_id),
     FOREIGN KEY (tip_id) REFERENCES tip(tip_id)
 ); 
