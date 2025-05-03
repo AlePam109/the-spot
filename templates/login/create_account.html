@@ -51,10 +51,12 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button onclick=createAccount() class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-user-plus me-2"></i>Create Account
                     </button>
                 </div>
+
+                <div id="status" class="alert mt-3 d-none"></div>
             </form>
 
             <div class="text-center mt-4">
@@ -101,13 +103,53 @@
 <script>
     document.getElementById('createAccountForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const accountType = document.querySelector('input[name="accountType"]:checked').value;
+        
         const name = document.getElementById('name').value;
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const accountType = document.querySelector('input[name="accountType"]:checked').value;
+        const status = document.getElementById('status');
         
-        // Add your account creation logic here
-        console.log('Account creation attempt:', { accountType, name, username, password });
+        const endpoint = accountType === 'business' 
+            ? '/api/login/create-business' 
+            : '/api/login/create-customer';
+
+        // Show loading state
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating account...';
+        submitButton.disabled = true;
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            status.classList.remove('d-none', 'alert-success', 'alert-danger');
+            
+            if (data.success) {
+                status.classList.add('alert-success');
+                status.innerHTML = '<i class="fas fa-check-circle me-2"></i>Account created successfully! Redirecting to login...';
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            } else {
+                status.classList.add('alert-danger');
+                status.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Account creation failed. Please try again.'}`;
+            }
+        })
+        .catch(error => {
+            status.classList.remove('d-none', 'alert-success');
+            status.classList.add('alert-danger');
+            status.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>An error occurred. Please try again.';
+        })
+        .finally(() => {
+            // Restore button state
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+        });
     });
 </script>
 {% endblock %}

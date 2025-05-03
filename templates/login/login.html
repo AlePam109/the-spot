@@ -12,20 +12,6 @@
             </div>
             
             <form id="loginForm">
-                <div class="text-center mb-4">
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="accountType" id="customer" value="customer" checked>
-                        <label class="btn btn-outline-primary" for="customer">
-                            <i class="fas fa-user me-2"></i>Customer Account
-                        </label>
-    
-                        <input type="radio" class="btn-check" name="accountType" id="business" value="business">
-                        <label class="btn btn-outline-primary" for="business">
-                            <i class="fas fa-store me-2"></i>Business Account
-                        </label>
-                    </div>
-                </div>
-                
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <div class="input-group">
@@ -42,11 +28,27 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="accountType" id="customer" value="customer" checked>
+                        <label class="btn btn-outline-primary" for="customer">
+                            <i class="fas fa-user me-2"></i>Customer
+                        </label>
+
+                        <input type="radio" class="btn-check" name="accountType" id="business" value="business">
+                        <label class="btn btn-outline-primary" for="business">
+                            <i class="fas fa-store me-2"></i>Business
+                        </label>
+                    </div>
+                </div>
+
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-sign-in-alt me-2"></i>Sign In
                     </button>
                 </div>
+
+                <div id="status" class="alert mt-3 d-none"></div>
             </form>
 
             <div class="text-center mt-4">
@@ -82,16 +84,64 @@
         padding: 12px;
         font-weight: 500;
     }
+
+    .btn-check:checked + .btn-outline-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        color: white;
+    }
 </style>
 
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const accountType = document.querySelector('input[name="accountType"]:checked').value;
+        const status = document.getElementById('status');
         
-        // Add your login logic here
-        console.log('Login attempt:', { username, password });
+        const endpoint = accountType === 'business' 
+            ? '/api/login/business' 
+            : '/api/login/customer';
+
+        // Show loading state
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing in...';
+        submitButton.disabled = true;
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            status.classList.remove('d-none', 'alert-success', 'alert-danger');
+            
+            if (data.success) {
+                status.classList.add('alert-success');
+                status.innerHTML = '<i class="fas fa-check-circle me-2"></i>Login successful! Redirecting...';
+                // Redirect based on account type
+                setTimeout(() => {
+                    window.location.href = accountType === 'business' ? '/manage' : '/search';
+                }, 1500);
+            } else {
+                status.classList.add('alert-danger');
+                status.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.error || 'Login failed. Please try again.'}`;
+            }
+        })
+        .catch(error => {
+            status.classList.remove('d-none', 'alert-success');
+            status.classList.add('alert-danger');
+            status.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>An error occurred. Please try again.';
+        })
+        .finally(() => {
+            // Restore button state
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+        });
     });
 </script>
 {% endblock %}
