@@ -242,7 +242,7 @@
     <div class="create-account-container">
         <div class="create-account-header">
             <h1><i class="fas fa-store me-2"></i>The Spot</h1>
-            <p>Create your account to get started</p>
+            <p id="createAccountText">Create your account to get started</p>
         </div>
 
         <div class="account-type-toggle">
@@ -295,12 +295,18 @@
                     if (currentAccountType === 'business') {
                         body.classList.remove('customer-theme');
                         body.classList.add('business-theme');
+                        document.getElementById('createAccountText').textContent = 'Create your business account to start managing your businesses';
                     } else {
                         body.classList.remove('business-theme');
                         body.classList.add('customer-theme');
+                        document.getElementById('createAccountText').textContent = 'Create your account to get started';
                     }
                 });
             });
+
+            // Set initial theme and text
+            body.classList.add('customer-theme');
+            document.getElementById('createAccountText').textContent = 'Create your account to get started';
 
             // Handle form submission
             form.addEventListener('submit', async function(e) {
